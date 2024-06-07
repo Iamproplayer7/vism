@@ -1,0 +1,5 @@
+export enum EventType {
+    PLAYER_CONNECTING,
+    PLAYER_CONNECTED,
+    PLAYER_DISCONNECTED
+}
