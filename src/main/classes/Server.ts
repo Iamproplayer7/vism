@@ -13,7 +13,7 @@ export class Server {
         this.InSimHandle = new InSim(InSimOptions);
 
         // handle InSim events
-        this.InSimHandle.on((name, data) => {
+        this.InSimHandle.onGlobal((name, data) => {
             for(const packet of Packet.all) {
                 if(packet.name == name) {
                     packet.callback(data, this);
