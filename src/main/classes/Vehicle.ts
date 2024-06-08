@@ -15,7 +15,7 @@ export class Vehicle {
     }
 
     static getByServer(server: Server) {
-        return Vehicle.all.find((v) => v.Server === server) ?? false;
+        return Vehicle.all.filter((v) => v.Server === server);
     }
 
     static respondToJoinRequest(player: Player, Status: boolean) {
