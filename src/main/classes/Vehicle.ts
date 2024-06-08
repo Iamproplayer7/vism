@@ -1,5 +1,5 @@
 import { JRRAction, PacketType } from "tsinsim";
-import { IS_CIM, IS_CNL, IS_CPR, IS_JRR, IS_NCI, IS_NCN, IS_NPL, IS_PLL, IS_PLP } from "tsinsim/packets";
+import { IS_JRR, IS_MCI, IS_NPL, IS_PLL, IS_PLP } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event } from "./Event.js";
 import { EventType } from "../enums/event.js";
@@ -39,7 +39,7 @@ export class Vehicle {
     Plate: string;
 
     Speed: number = 0;
-    Pos: { X: 0, Y: 0, Z: 0 } = { X: 0, Y: 0, Z: 0 };
+    Pos: { X: number, Y: number, Z: number } = { X: 0, Y: 0, Z: 0 };
     Heading: number = 0;
     Direction: number = 0;
 
@@ -81,6 +81,22 @@ export class Vehicle {
     public getFuel() {
         return this.Fuel;
     }
+
+    public getSpeed() {
+        return this.Speed;
+    }
+
+    public getPosition() {
+        return this.Pos;
+    }
+
+    public getHeading() {
+        return this.Heading;
+    }
+
+    public getDirection() {
+        return this.Direction;
+    }
 }
 
 Packet.on(PacketType.ISP_NPL, (data: IS_NPL) => {
@@ -106,5 +122,23 @@ Packet.on([PacketType.ISP_PLL, PacketType.ISP_PLP], (data: IS_PLL | IS_PLP) => {
         vehicle.valid = false;
         Vehicle.all.splice(indexOf, 1);
         Event.fire(EventType.VEHICLE_DESTROYED, vehicle, player);
+    }
+});
+
+Packet.on(PacketType.ISP_MCI, (data: IS_MCI) => {
+    for(const CompCar of data.Info) {
+        const vehicle = Vehicle.getByPLID(CompCar.PLID);
+        if(vehicle) {
+            vehicle.Speed = CompCar.Speed / 32768 * 360;
+            vehicle.Pos = {
+                X: CompCar.X / 65536,
+                Y: CompCar.Y / 65536,
+                Z: CompCar.Z / 65536,
+            };
+            vehicle.Heading = CompCar.Heading / 32768 * 180;
+            vehicle.Direction = CompCar.Direction / 182.0444444;
+
+            Event.fire(EventType.VEHICLE_UPDATE, vehicle);
+        }
     }
 });
