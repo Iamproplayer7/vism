@@ -3,6 +3,7 @@ import { IS_CIM, IS_CNL, IS_CPR, IS_NCI, IS_NCN } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event } from "./Event.js";
 import { EventType } from "../enums/event.js";
+import { Server } from "./Server.js";
 
 
 export class Player {
@@ -23,6 +24,7 @@ export class Player {
 
     // DEFAULT VALUES
     valid: boolean = false;
+    readonly Server: Server;
     readonly UCID: number;
     readonly Admin: boolean;
     readonly Username: string;
@@ -30,23 +32,28 @@ export class Player {
     UserID?: number;
     Language?: number;
     IpAdress?: string;
-    Interface?: { Mode: number, SubMode: number, SelType: number };
+    Interface: { Mode: number, SubMode: number, SelType: number };
     
-    constructor(data: IS_NCN) {
+    constructor(data: IS_NCN, server: Server) {
         // base
         this.valid = true;
+        this.Server = server;
         this.UCID = data.UCID;
         this.Username = data.UName;
         this.Admin = data.Admin == 1;
         this.Name = data.PName;
 
         // interface
-        this.Interface
+        this.Interface = { Mode: 0, SubMode: 0, SelType: 0 };
     }
 
     // getters
     public getUCID() {
         return this.UCID;
+    }
+
+    public getUserID() {
+        return this.UserID;
     }
 
     public getName() {
@@ -70,10 +77,10 @@ export class Player {
     }
 }
 
-Packet.on(PacketType.ISP_NCN, (data: IS_NCN) => {
+Packet.on(PacketType.ISP_NCN, (data: IS_NCN, server: Server) => {
     if(data.UCID === 0) return;
     
-    Player.all.push(new Player(data));
+    Player.all.push(new Player(data, server));
     Event.fire(EventType.PLAYER_CONNECTING, Player.getByUCID(data.UCID));
 });
 
@@ -92,7 +99,9 @@ Packet.on(PacketType.ISP_CPR, (data: IS_CPR) => {
     const player = Player.getByUCID(data.UCID);
     if(!player) return;
 
+    const Name = player.Name;
     player.Name = data.PName;
+    Event.fire(EventType.PLAYER_NAME_UPDATE, player, { old: Name, new: data.PName });
 });
 
 Packet.on(PacketType.ISP_CIM, (data: IS_CIM) => {
@@ -100,6 +109,7 @@ Packet.on(PacketType.ISP_CIM, (data: IS_CIM) => {
     if(!player) return;
 
     player.Interface = { Mode: data.Mode, SubMode: data.SubMode, SelType: data.SelType };
+    Event.fire(EventType.PLAYER_INTERFACE_UPDATE, player, player.Interface);
 });
 
 Packet.on(PacketType.ISP_CNL, (data: IS_CNL) => {
