@@ -1,6 +1,8 @@
 import { InSim } from "tsinsim";
 import { IS_ISI } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
+import { Event } from "./Event.js";
+import { EventType } from "../enums/event.js";
 
 export class Server {
     // STATIC START
@@ -23,10 +25,12 @@ export class Server {
 
         this.InSimHandle.on('connected', () => {
             console.log('[InSim] Connected');
+            Event.fire(EventType.SERVER_CONNECTED, this);
         });
 
         this.InSimHandle.on('disconnect', () => {
             console.log('[InSim] Disconnected');
+            Event.fire(EventType.SERVER_DISCONNECTED, this);
         });
     }
 
