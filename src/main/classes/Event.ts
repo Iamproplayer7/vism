@@ -4,7 +4,7 @@ type Name = string | number | number[] | string[];
 
 // STATIC CLASS
 export class Event {
-    constructor(public x: number, public y: number) { 
+    constructor() { 
         throw new Error('VISM.Event is a static class. new VISM.Event cannot be constructed.');
     }
 

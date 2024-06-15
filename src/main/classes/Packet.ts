@@ -3,7 +3,7 @@ import { Server } from "./Server.js";
 
 // STATIC CLASS
 export class Packet {
-    constructor(public x: number, public y: number) { 
+    constructor() { 
         throw new Error('VISM.Packet is a static class. new VISM.Packet cannot be constructed.');
     }
 
