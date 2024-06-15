@@ -24,7 +24,16 @@ export class Layout {
             }
         }
 
-        Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: Array.isArray(layout) ? layout : [layout] }));
+        if(Array.isArray(layout)) {
+            if(layout.length > 60) {
+                for(var i = 0; i < Math.ceil(layout.length / 60); i++) {
+                    Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: layout.slice(i*60, i*60+60) }));
+                }
+            }
+        }
+        else {
+            Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: [layout] }));
+        }
     }
 
     static remove(server: Server, layout: ObjectInfo | ObjectInfo[], callback: CALLBACK = null) {
@@ -39,7 +48,16 @@ export class Layout {
             }
         }
 
-        Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: Array.isArray(layout) ? layout : [layout] }));
+        if(Array.isArray(layout)) {
+            if(layout.length > 60) {
+                for(var i = 0; i < Math.ceil(layout.length / 60); i++) {
+                    Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: layout.slice(i*60, i*60+60) }));
+                }
+            }
+        }
+        else {
+            Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: [layout] }));
+        }
     }
 
     static removeAll(server: Server) {
@@ -82,8 +100,6 @@ Packet.on(PacketType.ISP_AXM, (data: IS_AXM) => {
                 added++;
             }
         }
-
-        if(added > 0) console.log(`[Layout] ${added} layouts added`);
     }
 
     if(data.PMOAction === PMOAction.PMO_DEL_OBJECTS) {
@@ -104,8 +120,6 @@ Packet.on(PacketType.ISP_AXM, (data: IS_AXM) => {
                 }
             }
         }
-
-        console.log(`[Layout] ${data.Info.length} layouts removed`);
     }
 
     if(data.PMOAction === PMOAction.PMO_CLEAR_ALL) {
