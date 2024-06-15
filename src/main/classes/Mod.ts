@@ -47,7 +47,7 @@ export class Mod {
     }
 
     static getAll(server: Server) {
-        return this.allowed.filter((m) => m.server === server);
+        return this.allowed.filter((m) => m.server === server).map((m) => m.id);
     }
     // STATIC END
 
