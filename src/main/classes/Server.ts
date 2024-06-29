@@ -41,24 +41,3 @@ export class Server {
         this.InSimHandle.connect({ Host, Port });
     }
 }
-
-/*
-import { InSim as InSim_, InSimFlags } from 'tsinsim';
-
-const INSIM_VERSION = 9;
-const INTERVAL = 100;
-
-export const InSim = new InSim_({
-    Admin: 'test',                      
-    Flags: InSimFlags.ALL_MULTIPLAYER,
-    Interval: INTERVAL, 
-    InSimVer: INSIM_VERSION, 
-    IName: 'VISM',
-    Prefix: 33                        
-});
-
-InSim.connect({ 
-    Host: '188.122.74.155', 
-    Port: 51617 
-});
-*/
