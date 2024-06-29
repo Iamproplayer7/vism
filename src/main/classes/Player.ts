@@ -118,7 +118,7 @@ Packet.on(PacketType.ISP_CNL, (data: IS_CNL) => {
 
     const indexOf = Player.all.indexOf(player);
     if(indexOf !== -1) {
-        Player.all.splice(indexOf, 1);
         Event.fire(EventType.PLAYER_DISCONNECTED, Player.getByUCID(data.UCID), data.Reason);
+        Player.all.splice(indexOf, 1);
     }
 });
