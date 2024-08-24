@@ -1,36 +1,41 @@
-export class Interval {
-    // STATIC START
-    static all: { 
-        [key: string]: { 
-            id: NodeJS.Timeout, 
-            performance: { 
-                last: number,
-                avg: { 
-                    time: number,
-                    times: number,
-                    avg: number
-                },
-                max: number,
-                min: number
-            }
+import { performance } from 'perf_hooks';
+
+export type Interval = { 
+    name: string;
+    id: NodeJS.Timeout;
+    performance: { 
+        ms: number;
+        last: number;
+        avg: { 
+            time: number;
+            times: number;
+            avg: number;
+        },
+        max: number;
+        min: number;
+    },
+    bind: any
+}
+
+export const Interval = {
+    all: [] as Interval[],
+
+    set(name: string, callback: () => void, ms: number, fireWhenCreated: boolean = true) {
+        if(this.all.find((interval) => interval.name === name)) {
+            console.log(`[Interval] Interval named ${name} already exists!`);
         }
-    } = { };
-
-    static set(name: string, callback: () => void, ms: number) {
-        console.log(Interval)
-        if(Interval.all[name]) return console.log(`[Interval] Interval named ${name} already exists!`);
-
-        const interval = setInterval(() => {
-            const startTime = process.hrtime();
+    
+        const IntervalCallback = () => {
+            const startTime = performance.now();
             callback();
-            const endTime = process.hrtime(startTime);
-            const time = parseFloat((endTime[0] + (endTime[1] / 1e9)).toString())*1000;
+            const endTime = performance.now();
+            const time = endTime-startTime
 
             if(time > 50) {
                 console.warn(`[Interval: ${name}] was too long ${Math.floor(time)} ms`)
             }
 
-            const interval = Interval.all[name];
+            const interval = this.all.find((int) => int.name === name);
             if(interval) {
                 interval.performance.last = time;
 
@@ -49,20 +54,38 @@ export class Interval {
                     interval.performance.min = time;
                 }
             }
-        }, ms);
+        }
 
-        this.all[name] = { id: interval, performance: { last: 0, avg: { time: 0, times: 0, avg: 0 }, max: 0, min: 0 } };
-    }
+        const NodeInterval = setInterval(IntervalCallback, ms);
+        if(fireWhenCreated) {
+            IntervalCallback();
+        }
+        
+        this.all.push({ name: name, id: NodeInterval, performance: { ms: ms, last: 0, avg: { time: 0, times: 0, avg: 0 }, max: 0, min: 0 }, bind: null });
+    
+        const self = this;
+        return {
+            bind(entity: any) {
+                self.all.forEach((v, i) => {
+                    if(v.name === name) {
+                        v.bind = entity;
+                    }
+                })
+            }
+        }
+    },
 
-    static clear(name: string) {
-        if(!Interval.all[name]) return;
+    clear(name: string) {
+        const interval = this.all.find((int) => int.name === name);
+        if(!interval) return;
 
-        clearInterval(Interval.all[name].id);
-        delete Interval.all[name];
-    }
-    // STATIC END
+        clearInterval(interval.id);
+        this.all = this.all.filter((int) => int !== interval);
+    },
 
-    constructor() { 
-        throw new Error('VISM.Interval is a static class. new VISM.Interval cannot be constructed.');
+    clearByBind(entity: any) {
+        this.all.filter((interval) => interval.bind === entity).forEach((interval) => {
+            this.clear(interval.name);
+        });
     }
 }
