@@ -1,17 +1,11 @@
-import { Server } from "./Server.js";
-
 type Name = string | number | number[] | string[];
+type CallbackFn = (...args: any[]) => void;
 
-// STATIC CLASS
-export class Event {
-    constructor() { 
-        throw new Error('VISM.Event is a static class. new VISM.Event cannot be constructed.');
-    }
+export const Event = {
+    all: [] as { name: Name, callback: CallbackFn }[],
 
-    // STATIC START
-    static all: { name: Name, callback: (...args: any[]) => void }[] = [];
-    static on(name: Name, callback: (...args: any[]) => void) {
-        if(typeof name == 'object') {
+    on(name: Name, callback: CallbackFn): void {
+        if(Array.isArray(name)) {
             for(const n of name) {
                 this.all.push({ name: n, callback });
             }
@@ -19,13 +13,11 @@ export class Event {
         else {
             this.all.push({ name, callback });
         }
-    }
+    },
 
-    static fire(name: Name, ...args: any[]){
-        const events = this.all.filter((event) => event.name === name);
-        for(const event of events) {
+    fire(name: Name, ...args: any[]): void {
+        this.all.filter((event) => event.name === name).forEach((event) => {
             event.callback(...args);
-        }
+        });
     }
-    // STATIC END
-}
+};
