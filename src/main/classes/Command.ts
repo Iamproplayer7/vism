@@ -1,46 +1,33 @@
 import { IS_MSO, PacketType, UserType } from "tsinsim";
 import { Packet } from "./Packet.js";
-import { Player } from "./Player.js";
+import { Server } from "./Server.js";
+import { PlayerGetter } from "./Player.js";
 
-// STATIC CLASS
-export class Command {
-    constructor() { 
-        throw new Error('VISM.Command is a static class. new VISM.Command cannot be constructed.');
-    }
+type CallbackFn = (...args: any[]) => void;
 
-    // STATIC START
-    static all: { name: string, callback: (...args: any[]) => void }[] = [];
-    static on(name: string, callback: (...args: any[]) => void) {
+export const Command = {
+    all: [] as { name: string, callback: CallbackFn }[],
+
+    on(name: string, callback: CallbackFn) {
         this.all.push({ name, callback });
-    }
+    },
 
-    static off(name: string) {
-        const command = this.all.find((command) => command.name === name);
-        if(command) {
-            const indexOf = this.all.indexOf(command);
-            if(indexOf !== -1) {
-                this.all.splice(indexOf, 1);
-            }
-        }
-    }
+    off(name: string) {
+        this.all = this.all.filter((command) => command.name !== name);
+    },
 
-    static fire(name: string, ...args: any[]){
-        const commands = this.all.filter((command) => command.name === name);
-        for(const command of commands) {
+    fire(name: string, ...args: any[]) {
+        this.all.filter((command) => command.name === name).forEach((command) => {
             command.callback(...args);
-        }
+        });
     }
-    // STATIC END
 }
 
-Packet.on(PacketType.ISP_MSO, (data: IS_MSO) => {
+Packet.on(PacketType.ISP_MSO, (data: IS_MSO, server: Server) => {
     if(data.UserType !== UserType.MSO_PREFIX) return;
-    const player = Player.getByUCID(data.UCID);
-    if(!player) return;
-
-    const Text = data.Text.slice(data.TextStart, data.Text.length);
-    if(Text.length <= 1) return;
-
-    const _ = Text.split(' ');
-    Command.fire(_[0].slice(1, _[0].length), player, ..._.slice(1, _.length));
+    const player = PlayerGetter.getByUCID(server, data.UCID); if(!player) return;
+    const Message = data.Text.slice(data.TextStart, data.Text.length);if(Message.length <= 1) return;
+    
+    const MessageChunks = Message.split(' ');
+    Command.fire(MessageChunks[0].slice(1, MessageChunks[0].length), player, ...MessageChunks.slice(1, MessageChunks.length));
 });
