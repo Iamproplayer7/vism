@@ -20,6 +20,10 @@ export const PlayerGetter = {
 
     getByUsername(server: Server, Username: string) {
         return this.all.find((player) => player.getServer() === server && player.getUsername().toLowerCase() === Username.toLowerCase());
+    },
+
+    getByUserID(server: Server, UserID: number) {
+        return this.all.find((player) => player.getServer() === server && player.getUserID() === UserID);
     }
 }
 
@@ -36,7 +40,7 @@ export interface Player {
     getLanguage(): number;
     getIpAdress(): string;
     getVehicle(): Vehicle | false;
-    setVehicle(vehicle: Vehicle): void;
+    setVehicle(vehicle: Vehicle | false): void;
     getInterface(): Interface;
 
     kick(text: string): void;
@@ -46,6 +50,7 @@ export interface Player {
     setInterval(name: string, callback: () => void, ms: number, fireWhenCreated?: boolean): void;
     clearInterval(name: string): void;
     getIntervals(): Interval[];
+    getInterval(name: string): undefined | Interval;
 
     allowVehicles(vehiclesFlags: CarFlags[]): void,
 }
@@ -140,12 +145,16 @@ class PlayerInternal implements Player  {
         return Interval.all.filter((interval) => interval.name.includes(`player-${this.getUCID()}`));
     }
 
+    getInterval(name: string) {
+        return Interval.all.find((interval) => interval.name.includes(`player-${this.getUCID()}-${name}`));
+    }
+
     message(text: string, sound?: number) {
         this.Server.InSimHandle.sendPacket(new IS_MTC({ UCID: this.UCID, Text: text, Sound: sound ?? 0 }));
     }
 
     kick(text: string = '') {
-        if(text = '') {
+        if(text == '') {
             return this.Server.InSimHandle.sendPacket(new IS_MST({ Msg: '/kick ' + this.Username }));
         }
 
@@ -154,7 +163,7 @@ class PlayerInternal implements Player  {
         setTimeout(() => {
             if(!this.valid) return;
             this.Server.InSimHandle.sendPacket(new IS_MST({ Msg: '/kick ' + this.Username }));
-        }, 100)
+        }, 100);
     }
 
     allowVehicles(vehiclesFlags: CarFlags[]) {
