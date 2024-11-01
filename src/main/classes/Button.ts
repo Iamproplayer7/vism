@@ -50,7 +50,6 @@ export class Button {
         Button.all.push(newButton);
 
         Event.fire(EventType.BUTTON_CREATED, newButton);
-
         return newButton;
     }
 
@@ -79,11 +78,7 @@ export class Button {
     }
 
     static getByUCIDClickID(server: Server, UCID: number, ClickID: number) {
-        //console.time('testas')
-        const d = Button.getByUCID(server, UCID).find((button) => button.valid && button.ClickID === ClickID);
-        //console.timeEnd('testas')
-
-        return d;
+        return Button.getByUCID(server, UCID).find((button) => button.valid && button.ClickID === ClickID);
     }
 
     static update(player: Player, Name: string, Group: string, data: Partial<SimpleButton> | Partial<InputButton> | Partial<InputButton>) {
@@ -151,7 +146,7 @@ export class Button {
             const key = k as keyof typeof data;
             const value = data[key];
             
-            if(['Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Text2'].includes(key)) {
+            if(['Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Text2', 'TypeIn'].includes(key)) {
                 if(this[key] !== value) {
                     this[key] = value as never;
                     updated = true;
