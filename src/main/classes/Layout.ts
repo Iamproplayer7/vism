@@ -2,6 +2,9 @@ import { IS_AXM, ObjectInfo, PacketType } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Server } from "./Server.js";
 import { PMOAction, PMOFlags } from "tsinsim";
+import { EventType } from "../enums/event.js";
+import { Event } from "./Event.js";
+import { PlayerGetter } from "./Player.js";
 
 const MAX_LAYOUT = 3000;
 type CALLBACK = ((status: boolean, layout: ObjectInfo) => void) | null;
@@ -30,6 +33,9 @@ export class Layout {
                     Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: layout.slice(i*60, i*60+60) }));
                 }
             }
+            else {
+                Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: layout }));
+            }
         }
         else {
             Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_ADD_OBJECTS, Info: [layout] }));
@@ -54,6 +60,9 @@ export class Layout {
                     Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: layout.slice(i*60, i*60+60) }));
                 }
             }
+            else {
+                Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: layout }));
+            }
         }
         else {
             Packet.send(server, new IS_AXM({ PMOAction: PMOAction.PMO_DEL_OBJECTS, Info: [layout] }));
@@ -70,7 +79,20 @@ export class Layout {
     }
 }
 
-Packet.on(PacketType.ISP_AXM, (data: IS_AXM) => {
+Packet.on(PacketType.ISP_AXM, (data: IS_AXM, server: Server) => {
+    const player = PlayerGetter.getByUCID(server, data.UCID);
+    if(!player) return;
+
+    if(data.PMOAction === PMOAction.PMO_ADD_OBJECTS) {
+        Event.fire(EventType.PLAYER_LAYOUT_ADD, player, data.Info)
+    }
+
+    if(data.PMOAction === PMOAction.PMO_DEL_OBJECTS) {
+        Event.fire(EventType.PLAYER_LAYOUT_REMOVE, player, data.Info)
+    }
+});
+
+Packet.on(PacketType.ISP_AXM, (data: IS_AXM, server: Server) => {
     if(data.PMOAction === PMOAction.PMO_TINY_AXM) {
         for(const layout of data.Info) {
             Layout.all.push(layout);
