@@ -167,7 +167,7 @@ export class Menu {
         return this;
     }
  
-    addButton(Type: MenuButtonType, Text: string = '', Callback: ((button: MenuButton, flags: string) => void) | ((button: MenuButton, text: string) => void) | false = false, Cache: [] = []): MenuButton {
+    addButton(Type: MenuButtonType, Text: string = '', Callback: ((button: MenuButton, flags: string) => void) | ((button: MenuButton, text: string) => void) | false = false, Cache: any[] = []): MenuButton {
         const menuButton = new MenuButton(this, Type, Text, Callback, Cache);
         this.Buttons.push(menuButton);
         this.draw();
@@ -186,19 +186,15 @@ export class Menu {
     }
  
     setInterval(callback: () => void, ms: number) {
-        if(this.IntervalName !== '') {
-            this.clearInterval();
-        }
+        this.clearInterval();
 
         this.IntervalName = 'menu-' + this.Group + '-interval';
-        Interval.set(this.IntervalName, callback, ms);
+        Interval.set(this.IntervalName, callback, ms, false).bind(this);
+        
     }
 
     clearInterval() {
-        if(this.IntervalName === '') return;
-
-        Interval.clear(this.IntervalName);
-        this.IntervalName = '';
+        Interval.clearByBind(this);
     }
 
     deleteAllButtonsButKeepThose(...keepButtons: MenuButton[]): Menu {
@@ -261,12 +257,13 @@ export class MenuButton {
     Description: string[];
 
     Callback: ((button: MenuButton, text: string) => void) | false;
-    Cache: [];
+    Cache: any[];
 
     Height: number;
     Style: ButtonStyle;
+    TypeIn: number;
 
-    constructor(Menu: Menu, Type: MenuButtonType, Text: string, Callback: ((button: MenuButton, flags: string) => void) | ((button: MenuButton, text: string) => void) | false, Cache: []) {
+    constructor(Menu: Menu, Type: MenuButtonType, Text: string, Callback: ((button: MenuButton, flags: string) => void) | ((button: MenuButton, text: string) => void) | false, Cache: any[]) {
         MenuButton.id++;
         this.id = MenuButton.id;
        
@@ -285,6 +282,7 @@ export class MenuButton {
 
         this.Height = 0;
         this.Style = ButtonStyle.ISB_LIGHT;
+        this.TypeIn = 95;
 
         // set default height
         this.recalculateHeight();
@@ -315,7 +313,7 @@ export class MenuButton {
         }
 
         if(this.Type === MenuButtonType.BUTTON_SPACE) {
-            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 3, Top, Left+2, '', 16);
+            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 3, Top, Left+2, '', ButtonStyle.ISB_NONE);
         }
 
         if(this.Type === MenuButtonType.BUTTON_TEXT) {
@@ -331,7 +329,7 @@ export class MenuButton {
         }
 
         if(this.Type === MenuButtonType.BUTTON_INPUT) {
-            Button.create(ButtonType.INPUT, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { Text2: this.TextInput, Callback: (text: string) => {
+            Button.create(ButtonType.INPUT, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { TypeIn: this.TypeIn, Text2: this.TextInput, Callback: (text: string) => {
                 if(this.Callback) {
                     this.Callback(this, text);
                 }
@@ -380,6 +378,16 @@ export class MenuButton {
         if(this.Style === Style) return this;
 
         this.Style = Style;
+        this.Menu.draw();
+
+        return this;
+    }
+
+    setTypeIn(TypeIn: number): MenuButton {
+        if(!this.valid || !this.Menu.valid) return this;
+        if(this.TypeIn === TypeIn) return this;
+
+        this.TypeIn = TypeIn;
         this.Menu.draw();
 
         return this;
