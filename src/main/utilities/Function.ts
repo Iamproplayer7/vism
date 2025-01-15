@@ -147,6 +147,15 @@ const Function = {
         }
         
         return { top: top < 0 ? 0 : top > 200 ? 200 : top, left: left < 0 ? 0 : left > 200 ? 200 : left };
+    },
+    stringToHex(str: string): string {
+        console.log(str, Buffer.from(str));
+        console.log(Buffer.from(str), Buffer.from(str)[0].toString(16), Buffer.from(str)[1].toString(16), Buffer.from(str)[2].toString(16));
+        return 'testas';
+    },
+    reverseHexString(str: string): string {
+        const r = str.match(/.{1,2}/g);
+        return r ? r.reverse().join('') : '';
     }
 }
 
