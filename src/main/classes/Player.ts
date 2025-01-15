@@ -22,6 +22,11 @@ export const PlayerGetter = {
         return this.all.find((player) => player.getServer() === server && player.getUsername().toLowerCase() === Username.toLowerCase());
     },
 
+    getByHalfUsername(server: Server, Username: string) {
+        const players = this.all.filter((player) => player.getServer() === server && Username.length >= 3 && player.getUsername().toLowerCase().includes(Username));
+        return players.length < 1 ? false : (players.length == 1 ? players[0] : players);
+    },
+
     getByUserID(server: Server, UserID: number) {
         return this.all.find((player) => player.getServer() === server && player.getUserID() === UserID);
     }
