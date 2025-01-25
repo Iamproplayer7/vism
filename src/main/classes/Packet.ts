@@ -1,44 +1,57 @@
 import { PacketType, Sendable } from "tsinsim/packets";
 import { Server } from "./Server.js";
 
-type Packet = { name: PacketType, callback: CallbackFn, bind?: any };
+type Packet = { id: number, name: PacketType, callback: CallbackFn, bind?: any };
 type CallbackFn = (data: any, server: Server) => void;
 
 export const Packet = {
     all: [] as Packet[],
+    number: 0,
 
     on(name: PacketType | PacketType[], callback: CallbackFn) {
-        var created: number[] = [];
+        var idsOfHandlers: number[] = [];
 
         if(Array.isArray(name)) {
             for(const n of name) {
-                created.push(this.all.push({ name: n, callback, bind: null })-1);
+                const packetId = Packet.number++;
+                this.all.push({ id: packetId, name: n, callback, bind: null })
+                idsOfHandlers.push(packetId);
             }
         }
         else {
-            created.push(this.all.push({ name: name, callback, bind: null })-1);
+            const packetId = Packet.number++;
+            this.all.push({ id: packetId, name: name, callback, bind: null })
+            idsOfHandlers.push(packetId);
         }
-        
-        const self = this;
+
         return {
+            id: idsOfHandlers.length == 1 ? idsOfHandlers[0] : idsOfHandlers,
             bind(entity: any) {
-                self.all.forEach((v, i) => {
-                    if(created.includes(i)) {
-                        v.bind = entity;
+                for(const id of idsOfHandlers) {
+                    const packet = Packet.all.find((p) => p.id === id);
+                    if(packet) {
+                        packet.bind = entity;
+                        if(packet.name == 23) {
+                            console.log('binded', packet)
+                        }
                     }
-                })
+                }
             }
         }
     },
 
-    off(name: PacketType) {
+    offByName(name: PacketType) {
         this.all = this.all.filter((packet) => packet.name !== name);
     },
 
+    offById(id: number) {
+        this.all = this.all.filter((packet) => packet.id !== id);
+    },
+
     offByBind(entity: any) {
-        this.all.filter((packet) => packet.bind === entity).forEach((packet) => {
-            this.off(packet.name);
-        });
+        for(const packet of this.all.filter((packet) => packet.bind === entity)) {
+            this.offById(packet.id);
+        }
     },
 
     send(server: Server, packet: Sendable) {
