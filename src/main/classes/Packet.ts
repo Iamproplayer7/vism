@@ -31,9 +31,6 @@ export const Packet = {
                     const packet = Packet.all.find((p) => p.id === id);
                     if(packet) {
                         packet.bind = entity;
-                        if(packet.name == 23) {
-                            console.log('binded', packet)
-                        }
                     }
                 }
             }
