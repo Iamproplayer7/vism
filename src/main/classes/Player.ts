@@ -44,8 +44,13 @@ export interface Player {
     isAdmin(): boolean;
     getLanguage(): number;
     getIpAdress(): string;
+
     getVehicle(): Vehicle | false;
     setVehicle(vehicle: Vehicle | false): void;
+
+    getAIVehicles(): Vehicle[];
+    addAIVehicle(vehicle: Vehicle): void;
+
     getInterface(): Interface;
 
     kick(text: string): void;
@@ -74,6 +79,7 @@ class PlayerInternal implements Player  {
     private IpAdress: string = '0.0.0.0';
 
     private Vehicle: Vehicle | false = false;
+    private AIVehicles: Vehicle[] = [];
     private Interface: Interface = { Mode: 0, SubMode: 0, SelType: 0 };
 
     constructor(data: IS_NCN, server: Server) {
@@ -134,6 +140,7 @@ class PlayerInternal implements Player  {
     getIpAdress()                { return this.IpAdress;  };
     getVehicle()                 { return this.Vehicle;   };
     setVehicle(vehicle: Vehicle) { this.Vehicle = vehicle; }
+    getAIVehicles()                 { return this.AIVehicles;   };
     getInterface()               { return this.Interface; };
        
     setInterval(name: string, callback: () => void, ms: number) {
@@ -178,6 +185,10 @@ class PlayerInternal implements Player  {
         }
 
         this.Server.InSimHandle?.sendPacket(new IS_PLC({ UCID: 255, Cars: flags }))
+    }
+
+    addAIVehicle(vehicle: Vehicle) { 
+        this.AIVehicles.push(vehicle);
     }
 }
 

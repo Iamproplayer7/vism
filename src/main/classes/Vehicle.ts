@@ -1,5 +1,5 @@
-import { JRRAction, PacketType, PlayerHCapFlags } from "tsinsim";
-import { IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, PlayerHCap } from "tsinsim/packets";
+import { JRRAction, PacketType, PlayerHCapFlags, PlayerType } from "tsinsim";
+import { IS_AII, IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, PlayerHCap } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event } from "./Event.js";
 import { EventType } from "../enums/event.js";
@@ -29,6 +29,7 @@ export const VehicleGetter = {
 export interface Vehicle {
     valid: boolean; 
     isMod: boolean;
+    isAI: boolean;
 
     getServer(): Server; 
     getPlayer(): Player,
@@ -52,6 +53,7 @@ export interface Vehicle {
 class VehicleInternal implements Vehicle  {
     valid: boolean;
     isMod: boolean;
+    isAI: boolean;
 
     private Server: Server;
     private Player: Player;
@@ -70,7 +72,8 @@ class VehicleInternal implements Vehicle  {
     constructor(data: IS_NPL, player: Player) {
         this.valid = true;
         this.isMod = !CARS.includes(data.CName);
-    
+        this.isAI = (data.PType & 2) !== 0;
+
         this.Server = player.getServer();
         this.Player = player;
         this.PLID = data.PLID;
@@ -204,7 +207,13 @@ Packet.on(PacketType.ISP_NPL, (data: IS_NPL, server: Server) => {
     } 
     
     const vehicle = new VehicleInternal(data, player);
-    player.setVehicle(vehicle);
+    if(vehicle.isAI) {
+        player.addAIVehicle(vehicle);
+    }
+    else {
+        player.setVehicle(vehicle);
+    }
+    
     VehicleGetter.all.push(vehicle);
     Event.fire(EventType.VEHICLE_CREATED, vehicle, player);
 });
