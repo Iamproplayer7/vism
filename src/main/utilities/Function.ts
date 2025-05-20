@@ -1,3 +1,5 @@
+import { Vector2 } from "tsinsim";
+
 const Function = { 
     wait: (ms: number) => {
         return new Promise((resolve) => {
@@ -89,16 +91,16 @@ const Function = {
         return text;
     },
 
-    Atan2Positive(x1: number, y1: number, x2: number, y2: number) {
-        var xx = x2 - x1;
-        var yy = y2 - y1;
+    Atan2Positive(v1: Vector2, v2: Vector2) {
+        var xx = v2.subX(v1.x).x;
+        var yy = v2.subY(v1.y).y;
     
         const theta = Math.atan2(xx, yy) * 180 / Math.PI;
         return theta < 0 ? 360 + theta : theta;
     },
     
-    getHeadingByCoord(x1: number, y1: number, x2: number, y2: number, heading: number) {
-        const atan = this.Atan2Positive(x1, y1, x2, y2);
+    getHeadingByCoord(v1: Vector2, v2: Vector2, heading: number) {
+        const atan = this.Atan2Positive(v1, v2);
         
         var heading = atan+heading;
         if(heading >= 360) { 
@@ -108,8 +110,8 @@ const Function = {
         return heading;
     },
     
-    getScreenCoordFromWorldCoord(x1: number, y1: number, x2: number, y2: number, heading: number) {
-        var headingInDegrees = this.getHeadingByCoord(x1, y1, x2, y2, heading);
+    getScreenCoordFromWorldCoord(v1: Vector2, v2: Vector2, heading: number) {
+        var headingInDegrees = this.getHeadingByCoord(v1, v2, heading);
     
         headingInDegrees -= 180;    
         headingInDegrees /= 180;
