@@ -181,7 +181,7 @@ export class Button {
     
         
         const packet = new IS_BTN;
-        packet.UCID = this.Player.getUCID();
+        packet.UCID = this.Server.isLocal ? 0 : this.Player.getUCID();
         packet.ReqI = this.ClickID + 1;
         packet.ClickID = this.ClickID;
         packet.Inst = this.Inst;
@@ -236,7 +236,7 @@ Packet.on(PacketType.ISP_BTT, (data: IS_BTT, server: Server) => {
 
     if(!player) return;
 
-    const button = Button.getByUCIDClickID(server, data.UCID, data.ClickID);
+    const button = Button.getByUCIDClickID(server, player.getUCID(), data.ClickID);
     if(!button) return;
 
     Event.fire(EventType.BUTTON_INPUT, button, player, data.Text);
