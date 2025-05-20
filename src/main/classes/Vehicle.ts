@@ -1,11 +1,10 @@
-import { JRRAction, PacketType, PlayerHCapFlags, PlayerType } from "tsinsim";
-import { IS_AII, IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, PlayerHCap } from "tsinsim/packets";
+import { JRRAction, PacketType, PlayerHCapFlags, Vector3 } from "tsinsim";
+import { IS_AII, IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, OSMain, PlayerHCap } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event } from "./Event.js";
 import { EventType } from "../enums/event.js";
 import { Player, PlayerGetter } from "./Player.js";
 import { Server } from "./Server.js";
-import Function from "../utilities/Function.js";
 
 const CARS = ['UF1', 'XFG', 'XRG', 'LX4', 'LX6', 'RB4', 'FXO', 'XRT', 'RAC', 'FZ5', 'UFR', 'XFR', 'FXR', 'XRR', 'FZR', 'MRT', 'FBM', 'FOX', 'FO8', 'BF1'];
 
@@ -34,6 +33,7 @@ export interface Vehicle {
     getServer(): Server; 
     getPlayer(): Player,
     getPLID(): number; 
+    getPName(): string;
     getName(): string;
     getSName(): string;
     getMass(): number;
@@ -41,11 +41,22 @@ export interface Vehicle {
     getFuel(): number;
     getPlate(): string;
     getSpeed(): number;
-    getPosition(): { X: number, Y: number, Z: number };
-    setPosition(position: { X: number, Y: number, Z: number }, repair: boolean, heading: number): void;
+    getPosition(): Vector3;
+    setPosition(position: Vector3, repair: boolean, heading: number): void;
     setMass(mass: number): void;
     getHeading(): number;
     getDirection(): number;
+    getAIData(): { 
+        received: boolean;
+        OSData: OSMain;
+        Heading: number;
+        Direction: number;
+        Engine: boolean;
+        Gear: number;
+        RPM: number;
+        Speed: number;
+    }
+
     removeFromTrack(): void;
 }
 
@@ -58,6 +69,7 @@ class VehicleInternal implements Vehicle  {
     private Server: Server;
     private Player: Player;
     private PLID: number;
+    private PName: string;
     private CName: string;
     private SName: string;
     private HMass: number;
@@ -65,9 +77,19 @@ class VehicleInternal implements Vehicle  {
     private Fuel: number;
     private Plate: string;
     private Speed: number;
-    private Pos: { X: number, Y: number, Z: number };
+    private Pos: Vector3;
     private Heading: number;
     private Direction: number;
+    private AIData: {
+        received: boolean,
+        OSData: OSMain,
+        Heading: number,
+        Direction: number,
+        Engine: boolean,
+        Gear: number,
+        RPM: number,
+        Speed: number
+    }
 
     constructor(data: IS_NPL, player: Player) {
         this.valid = true;
@@ -77,6 +99,7 @@ class VehicleInternal implements Vehicle  {
         this.Server = player.getServer();
         this.Player = player;
         this.PLID = data.PLID;
+        this.PName = data.PName;
         this.CName = data.CName;
         this.SName = data.SName;
         this.HMass = data.H_Mass;
@@ -85,9 +108,20 @@ class VehicleInternal implements Vehicle  {
         this.Plate = data.Plate;
 
         this.Speed = 0;
-        this.Pos = { X: 0, Y: 0, Z: 0 };
+        this.Pos = new Vector3;
         this.Heading = 0;
         this.Direction = 0;
+
+        this.AIData = {
+            received: false,
+            OSData: new OSMain,
+            Heading: 0,
+            Direction: 0,
+            Engine: false,
+            Gear: 0,
+            RPM: 0,
+            Speed: 0
+        };
         
         // player leaves track
         Packet.on([PacketType.ISP_PLL, PacketType.ISP_PLP], (data: IS_PLL | IS_PLP, server: Server) => {
@@ -109,11 +143,7 @@ class VehicleInternal implements Vehicle  {
                 if(CompCar.PLID !== this.PLID) continue;
 
                 this.Speed = CompCar.Speed / 32768 * 360;
-                this.Pos = {
-                    X: CompCar.X / 65536,
-                    Y: CompCar.Y / 65536,
-                    Z: CompCar.Z / 65536,
-                };
+                this.Pos = new Vector3(CompCar.X, CompCar.Y, CompCar.Z).div(65536);
 
                 this.Heading = CompCar.Heading / 32768 * 180;
                 this.Direction = CompCar.Direction / 182.0444444;
@@ -155,11 +185,44 @@ class VehicleInternal implements Vehicle  {
 
             Event.fire(EventType.VEHICLE_PIT_STOP_END, this);
         }).bind(this);
+
+        // AI info packet
+        Packet.on(PacketType.ISP_AII, (data: IS_AII, server: Server) => {
+            if(server !== this.Server) return;
+            if(data.PLID !== this.PLID) return;
+
+            // position
+            data.OSData.Pos = new Vector3(data.OSData.Pos).div(65536);
+
+            // direction
+            //var direction_deg = Math.atan2(-data.OSData.Vel.X, data.OSData.Vel.Y) * 180 / Math.PI;
+            //direction_deg = direction_deg > 0 ? direction_deg : 360+direction_deg;
+
+            // heading
+            var heading = data.OSData.Heading * 180 / Math.PI;
+            heading = heading > 0 ? heading : 360+heading;
+
+            const horg = data.OSData.Heading;
+            data.OSData.Heading = heading;
+
+
+            this.AIData = {
+                received: true,
+                OSData: data.OSData,
+                Heading: horg,
+                Direction: Math.atan2(-data.OSData.Vel.x, data.OSData.Vel.y),
+                Engine: (data.Flags & 1) !== 0,
+                Gear: data.Gear-1,
+                RPM: data.RPM,
+                Speed: data.OSData.Vel.length()*3.6
+            }
+        }).bind(this);
     }
 
     getServer()    { return this.Server;    };
     getPlayer()    { return this.Player;    };
     getPLID()      { return this.PLID;      };
+    getPName()     { return this.PName;     };
     getName()      { return this.CName;     };
     getSName()     { return this.SName;     };
     getMass()      { return this.HMass;     };
@@ -171,12 +234,14 @@ class VehicleInternal implements Vehicle  {
     getHeading()   { return this.Heading;   };
     getDirection() { return this.Direction; };
 
-    setPosition(position: { X: number, Y: number, Z: number }, repair: boolean = false, heading: number = 0) {
+    getAIData() { return this.AIData; };
+
+    setPosition(position: Vector3, repair: boolean = false, heading: number = 0) {
         // degrees to 256 & reverse
         heading = heading * 256 / 360;
         heading = Math.floor(heading > 128 ? heading-128 : heading+128);
   
-        const packet = new IS_JRR({ PLID: this.getPLID(), JRRAction: repair ? 4 : 5, StartPos: new ObjectInfo({ X: Math.floor(position.X*16), Y: Math.floor(position.Y*16), ZByte: Math.floor(position.Z*4), Heading: heading, Flags: 128 }) })
+        const packet = new IS_JRR({ PLID: this.getPLID(), JRRAction: repair ? 4 : 5, StartPos: new ObjectInfo({ X: Math.floor(position.x*16), Y: Math.floor(position.y*16), ZByte: Math.floor(position.z*4), Heading: heading, Flags: 128 }) })
         this.getServer().InSimHandle.sendPacket(packet);
     }
 
@@ -192,7 +257,7 @@ class VehicleInternal implements Vehicle  {
 
     removeFromTrack() {
         this.getServer().InSimHandle.sendPacket(new IS_MST( {
-            Msg: '/spec ' + this.getPlayer().getUsername(),
+            Msg: '/spec ' + (this.isAI ? this.PName : this.getPlayer().getUsername()),
         }));
     }
 }
