@@ -110,20 +110,20 @@ export class Button {
     readonly Player: Player;
     ClickID: number;
 
-    Name: string;
-    Group: string;
-    Width: number;
-    Height: number;
-    Top: number;
-    Left: number;
-    Text: string;
-    Text2: string;
-    TypeIn: number;
-    Style: number;
+    Name: string = '';
+    Group: string = '';
+    Width: number = 0;
+    Height: number = 0;
+    Top: number = 0;
+    Left: number = 0;
+    Text: string = '';
+    Text2: string = '';
+    TypeIn: number = 0;
+    Style: number = 0;
 
     
-    Callback: (arg1: string) => void;
-    Inst: number;
+    Callback: (arg1: string) => void = (arg1: string) => { };
+    Inst: number = 0;
 
     constructor(type: ButtonType, player: Player, data: SimpleButton | ClickButton | InputButton) {
         // base
@@ -213,44 +213,53 @@ export class Button {
     // IS_BFN: player press SHIFT+I
 
 Packet.on(PacketType.ISP_BTC, (data: IS_BTC, server: Server) => {
-    const button = Button.getByUCIDClickID(server, data.UCID, data.ClickID);
-    if(button) {
-        const player = PlayerGetter.getByUCID(server, data.UCID);
-        if(player) {
-            Event.fire(EventType.BUTTON_CLICK, button, player, data.CFlags);
+    const player = server.isLocal ? 
+        PlayerGetter.all.find((p) => p.isLocal()) 
+        : PlayerGetter.getByUCID(server, data.UCID);
 
-            if(button.Callback) {
-                button.Callback(data.CFlags.toString());
-            }
-        }
+    if(!player) return;
+
+    const button = Button.getByUCIDClickID(server, player.getUCID(), data.ClickID);
+    if(!button) return;
+
+    Event.fire(EventType.BUTTON_CLICK, button, player, data.CFlags);
+
+    if(button.Callback) {
+        button.Callback(data.CFlags.toString());
     }
 });
 
 Packet.on(PacketType.ISP_BTT, (data: IS_BTT, server: Server) => {
-    const button = Button.getByUCIDClickID(server, data.UCID, data.ClickID);
-    if(button) {
-        const player = PlayerGetter.getByUCID(server, data.UCID);
-        if(player) {
-            Event.fire(EventType.BUTTON_INPUT, button, player, data.Text);
+    const player = server.isLocal ? 
+        PlayerGetter.all.find((p) => p.isLocal()) 
+        : PlayerGetter.getByUCID(server, data.UCID);
 
-            if(button.Callback) {
-                button.Callback(data.Text);
-            }
-        }
+    if(!player) return;
+
+    const button = Button.getByUCIDClickID(server, data.UCID, data.ClickID);
+    if(!button) return;
+
+    Event.fire(EventType.BUTTON_INPUT, button, player, data.Text);
+
+    if(button.Callback) {
+        button.Callback(data.Text);
     }
 });
 
 Packet.on(PacketType.ISP_BFN, (data: IS_BFN, server: Server) => {
-    const player = PlayerGetter.getByUCID(server, data.UCID);
-    if(player) {
-        // delete buttons
-        for(const button of Button.getByPlayer(player)) {
-            button.delete();
-        }
+    const player = server.isLocal ? 
+        PlayerGetter.all.find((p) => p.isLocal()) 
+        : PlayerGetter.getByUCID(server, data.UCID);
 
-        // clear again
-        server.InSimHandle?.sendPacket(new IS_BFN({ SubT: ButtonFunction.BFN_CLEAR, UCID: data.UCID }));
+    if(!player) return;
 
-        Event.fire(EventType.BUTTON_CLEAR, player);
+    // delete buttons
+    for(const button of Button.getByPlayer(player)) {
+        button.delete();
     }
+
+    // clear again
+    server.InSimHandle?.sendPacket(new IS_BFN({ SubT: ButtonFunction.BFN_CLEAR, UCID: data.UCID }));
+
+    Event.fire(EventType.BUTTON_CLEAR, player);
 });

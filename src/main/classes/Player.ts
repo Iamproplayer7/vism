@@ -40,6 +40,7 @@ export interface Player {
     getUCID(): number; 
     getUserID(): number;
     getName(): string;
+    isLocal(): boolean;
     getUsername(): string;
     isAdmin(): boolean;
     getLanguage(): number;
@@ -74,6 +75,8 @@ class PlayerInternal implements Player  {
     private Admin: boolean;
     private Name: string;
 
+    private Local: boolean;
+
     private UserID: number = 0;
     private Language: number = 0;
     private IpAdress: string = '0.0.0.0';
@@ -89,6 +92,8 @@ class PlayerInternal implements Player  {
         this.Username = data.UName;
         this.Admin = data.Admin == 1;
         this.Name = data.PName;
+
+        this.Local = data.Flags === 0;
         
         // additional player info
         Packet.on(PacketType.ISP_NCI, (data: IS_NCI, server: Server) => {
@@ -134,6 +139,7 @@ class PlayerInternal implements Player  {
     getUCID()                    { return this.UCID;      };
     getUserID()                  { return this.UserID;    };
     getName()                    { return this.Name;      };
+    isLocal()                    { return this.Local;     };
     getUsername()                { return this.Username;  };
     isAdmin()                    { return this.Admin;     };
     getLanguage()                { return this.Language;  };

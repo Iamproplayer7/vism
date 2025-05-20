@@ -1,4 +1,4 @@
-import { InSim } from "tsinsim";
+import { InSim, InSimFlags } from "tsinsim";
 import { IS_ISI, IS_MST, IS_MTC } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event } from "./Event.js";
@@ -7,6 +7,7 @@ import { EventType } from "../enums/event.js";
 export type Server = {
     InSimHandle: InSim,
 
+    isLocal: boolean,
     connect: (Host: string, Port: number) => void,
     disconnect: () => void,
     message: (text: string, sound?: number) => void,
@@ -21,6 +22,7 @@ export const Server = {
         
         const ServerObject: Server = {
             InSimHandle: InSimHandle,
+            isLocal: InSimOptions.Flags ? (InSimOptions.Flags & InSimFlags.ISF_LOCAL) !== 0 : false,
 
             connect(Host, Port) {
                 console.log('[InSim] Connecting to ' + Host + ':' + Port);
