@@ -30,7 +30,7 @@
 	},
 	"homepage": "https://github.com/Iamproplayer7/vism#readme",
 	"dependencies": {
-		"tsinsim": "^1.1.0",
+		"tsinsim": "^1.2.8",
 		"tsx": "^4.12.0",
 		"typescript": "^5.4.5"
 	},
