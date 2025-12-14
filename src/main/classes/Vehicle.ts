@@ -237,11 +237,23 @@ class VehicleInternal implements Vehicle  {
     getAIData() { return this.AIData; };
 
     setPosition(position: Vector3, repair: boolean = false, heading: number = 0) {
-        // degrees to 256 & reverse
-        heading = heading * 256 / 360;
-        heading = Math.floor(heading > 128 ? heading-128 : heading+128);
+        // degrees reverse & 0-256
+        heading += 180; // reverse
+        heading = heading % 360;
+        heading = Math.floor(heading * 256 / 360); // 0-256 range
   
-        const packet = new IS_JRR({ PLID: this.getPLID(), JRRAction: repair ? 4 : 5, StartPos: new ObjectInfo({ X: Math.floor(position.x*16), Y: Math.floor(position.y*16), ZByte: Math.floor(position.z*4), Heading: heading, Flags: 128 }) })
+        const packet = new IS_JRR({ 
+            PLID: this.getPLID(), 
+            JRRAction: repair ? 4 : 5, 
+            StartPos: new ObjectInfo({ 
+                X: Math.floor(position.x*16), 
+                Y: Math.floor(position.y*16), 
+                ZByte: Math.floor(position.z*4), 
+                Heading: heading, 
+                Flags: 128 
+            }) 
+        });
+        
         this.getServer().InSimHandle.sendPacket(packet);
     }
 
