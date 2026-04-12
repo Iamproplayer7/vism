@@ -31,7 +31,7 @@ export const PlayerGetter = {
     }
 }
 
-type Interface = { Mode: number, SubMode: number, SelType: number };
+export type Interface = { Mode: number, SubMode: number, SelType: number };
 
 export interface Player {
     valid: boolean; 
