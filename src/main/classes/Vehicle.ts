@@ -123,7 +123,19 @@ class VehicleInternal implements Vehicle  {
         };
         
         // player leaves track
-        Packet.on([PacketType.ISP_PLL, PacketType.ISP_PLP], (data: IS_PLL | IS_PLP, server: Server) => {
+        Packet.on(PacketType.ISP_PLL, (data, server) => {
+            if(server !== this.Server || data.PLID !== this.PLID) return;
+        
+            Event.fire(EventType.VEHICLE_DESTROYED, this, this.Player);
+            this.valid = false;
+            this.Player.setVehicle(false);
+
+            Packet.offByBind(this);
+            VehicleGetter.all = VehicleGetter.all.filter((vehicle) => vehicle !== this);
+        }).bind(this);
+
+        // player leaves track
+        Packet.on( PacketType.ISP_PLP, (data, server) => {
             if(server !== this.Server || data.PLID !== this.PLID) return;
         
             Event.fire(EventType.VEHICLE_DESTROYED, this, this.Player);
