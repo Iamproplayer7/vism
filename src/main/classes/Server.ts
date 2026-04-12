@@ -1,8 +1,7 @@
 import { InSim, InSimFlags } from "tsinsim";
 import { IS_ISI, IS_MST, IS_MTC } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
-import { Event } from "./Event.js";
-import { EventType } from "../enums/event.js";
+import { Event, EventType } from "./Event.js";
 
 export type Server = {
     InSimHandle: InSim,

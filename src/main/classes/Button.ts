@@ -1,8 +1,7 @@
 import { ButtonClickFlags, ButtonFunction, ButtonStyle, IS_BFN, IS_BTC, IS_BTN, IS_BTT, PacketType } from "tsinsim";
 import { Player, PlayerGetter } from "./Player.js";
 import { Server } from "./Server.js";
-import { Event } from "./Event.js";
-import { EventType } from "../enums/event.js";
+import { Event, EventType } from "./Event.js";
 import { Packet } from "./Packet.js";
 
 export enum ButtonType {

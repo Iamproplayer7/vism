@@ -1,8 +1,7 @@
 import { JRRAction, PacketType, PlayerHCapFlags, Vector3 } from "tsinsim";
 import { IS_AII, IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, OSMain, PlayerHCap } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
-import { Event } from "./Event.js";
-import { EventType } from "../enums/event.js";
+import { Event, EventType } from "./Event.js";
 import { Player, PlayerGetter } from "./Player.js";
 import { Server } from "./Server.js";
 

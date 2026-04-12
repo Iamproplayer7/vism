@@ -1,7 +1,6 @@
 import { ButtonStyle } from "tsinsim";
-import { EventType } from "../enums/event.js";
 import { Button, ButtonType } from "./Button.js";
-import { Event } from "./Event.js";
+import { Event, EventType } from "./Event.js";
 import { Player } from "./Player.js";
 import { Interval } from "../utilities/Interval.js";
 import Function from "../utilities/Function.js";
@@ -121,9 +120,6 @@ export class Menu {
         }
 
         if(this.Buttons.length > BUTTONS_IN_PAGE) {
-            console.log(this.Buttons.length,BUTTONS_IN_PAGE, Math.ceil((this.Buttons.length/BUTTONS_IN_PAGE)))
-            
-            
             Button.create(ButtonType.INPUT, this.Player, 'PAGE', this.Group, this.Width-14, 4, position.top+2, position.left+7, '^7Page ^2' + (this.Page+1) + ' ^7of ' + Math.ceil((this.Buttons.length/BUTTONS_IN_PAGE)), ButtonStyle.ISB_LIGHT, { Callback: (text: string) => {
                 const page = Function.int(text);
                 if(page < 1 || page > Math.ceil((this.Buttons.length/BUTTONS_IN_PAGE))) return;
@@ -414,7 +410,7 @@ export class MenuButton {
     }
 }
 
-Event.on(EventType.BUTTON_CLEAR, (player: Player) => {
+Event.on(EventType.BUTTON_CLEAR, (player) => {
     const menu = Menu.getActive(player);
     if(menu && menu.valid) {
         menu.delete();

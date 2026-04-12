@@ -2,8 +2,7 @@ import { IS_AXM, ObjectInfo, PacketType } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Server } from "./Server.js";
 import { PMOAction, PMOFlags } from "tsinsim";
-import { EventType } from "../enums/event.js";
-import { Event } from "./Event.js";
+import { Event, EventType } from "./Event.js";
 import { PlayerGetter } from "./Player.js";
 
 const MAX_LAYOUT = 3000;

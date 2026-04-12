@@ -1,8 +1,7 @@
 import { CarFlags, PacketType } from "tsinsim";
 import { IS_CIM, IS_CNL, IS_CPR, IS_MST, IS_MTC, IS_NCI, IS_NCN, IS_PLC } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
-import { Event } from "./Event.js";
-import { EventType } from "../enums/event.js";
+import { Event, EventType } from "./Event.js";
 import { Server } from "./Server.js";
 import { Interval } from "../utilities/Interval.js";
 import { Vehicle } from "./Vehicle.js";
