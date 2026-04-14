@@ -1,4 +1,4 @@
-import { ButtonClickFlags, CarContOBJ, IS_NPL, LeaveReason, ObjectIndex, ObjectInfo } from "tsinsim";
+import { ButtonClickFlags, CarContOBJ, IS_NPL, LeaveReason, ObjectIndex, ObjectInfo, PenaltyReason, PenaltyValue } from "tsinsim";
 import { Button } from "./Button.js";
 import { Interface, Player } from "./Player.js";
 import { Server } from "./Server.js";
@@ -21,6 +21,7 @@ export enum EventType {
     VEHICLE_HIT_OBJECT,
     VEHICLE_PIT_STOP_START,
     VEHICLE_PIT_STOP_END,
+    VEHICLE_PENALTY,
 
     BUTTON_CREATED,
     BUTTON_REMOVED,
@@ -51,6 +52,7 @@ type EventMap = {
     [EventType.VEHICLE_HIT_OBJECT]: [ vehicle: Vehicle, index: ObjectIndex, speed: CarContOBJ['Speed'] ];
     [EventType.VEHICLE_PIT_STOP_START]: [ vehicle: Vehicle ];
     [EventType.VEHICLE_PIT_STOP_END]: [ vehicle: Vehicle ];
+    [EventType.VEHICLE_PENALTY]: [ vehicle: Vehicle, { old: PenaltyValue, new: PenaltyValue, reason: PenaltyReason } ];
 
     [EventType.BUTTON_CREATED]: [ button: Button ];
     [EventType.BUTTON_REMOVED]: [ button: Button ];
@@ -73,24 +75,28 @@ type Name = string | number | number[] | string[];
 type CallbackFn<T = any> = (...args: EventArgs<T>) => void;
 type EventEntry<T = any> = {
     name: EventType | Name;
+    priority: boolean;
     callback: CallbackFn<T>;
 };
 
 export const Event = {
     all: [] as EventEntry[],
 
-    on<T extends EventType | Name>(name: T, callback: CallbackFn<T>) {
+    on<T extends EventType | Name>(name: T, callback: CallbackFn<T>, priorityToCall = false) {
         if (Array.isArray(name)) {
             for (const n of name) {
-                this.all.push({ name: n, callback });
+                this.all.push({ name: n, priority: priorityToCall, callback });
             }
         } else {
-            this.all.push({ name, callback });
+            this.all.push({ name, priority: priorityToCall, callback });
         }
     },
 
     fire<T extends EventType | Name>(name: T, ...args: EventArgs<T> & any[]) {
-        this.all.filter((entry) => entry.name === name).forEach((entry) => {
+        const entries = this.all.filter((entry) => entry.name === name);
+        entries.sort((a, b) => Number(b.priority) - Number(a.priority))
+        
+        entries.forEach((entry) => {
             entry.callback(...args);
         });
     }
