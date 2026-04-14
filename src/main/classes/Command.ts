@@ -1,9 +1,8 @@
-import { IS_MSO, PacketType, UserType } from "tsinsim";
+import { PacketType, UserType } from "tsinsim";
 import { Packet } from "./Packet.js";
-import { Server } from "./Server.js";
-import { PlayerGetter } from "./Player.js";
+import { Player, PlayerGetter } from "./Player.js";
 
-type CallbackFn = (...args: any[]) => void;
+type CallbackFn = (player: Player, ...args: any[]) => void;
 
 export const Command = {
     all: [] as { name: string, callback: CallbackFn }[],
@@ -16,14 +15,14 @@ export const Command = {
         this.all = this.all.filter((command) => command.name !== name);
     },
 
-    fire(name: string, ...args: any[]) {
+    fire(name: string, player: Player, ...args: any[]) {
         this.all.filter((command) => command.name === name).forEach((command) => {
-            command.callback(...args);
+            command.callback(player, ...args);
         });
     }
 }
 
-Packet.on(PacketType.ISP_MSO, (data: IS_MSO, server: Server) => {
+Packet.on(PacketType.ISP_MSO, (data, server) => {
     if(data.UserType !== UserType.MSO_PREFIX) return;
     const player = PlayerGetter.getByUCID(server, data.UCID); if(!player) return;
     const Message = data.Text.slice(data.TextStart, data.Text.length);if(Message.length <= 1) return;
