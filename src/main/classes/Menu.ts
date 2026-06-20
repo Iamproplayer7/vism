@@ -204,7 +204,7 @@ export class Menu {
     }
 
     delete() {
-        if(!this.valid) return;
+        if(!this.valid) return false;
 
         this.clearInterval()
 

@@ -211,7 +211,7 @@ export class Button {
     // IS_BTT: player type in input
     // IS_BFN: player press SHIFT+I
 
-Packet.on(PacketType.ISP_BTC, (data: IS_BTC, server: Server) => {
+Packet.on(PacketType.ISP_BTC, (data, server) => {
     const player = server.isLocal ? 
         PlayerGetter.all.find((p) => p.isLocal()) 
         : PlayerGetter.getByUCID(server, data.UCID);
@@ -228,7 +228,7 @@ Packet.on(PacketType.ISP_BTC, (data: IS_BTC, server: Server) => {
     }
 });
 
-Packet.on(PacketType.ISP_BTT, (data: IS_BTT, server: Server) => {
+Packet.on(PacketType.ISP_BTT, (data, server) => {
     const player = server.isLocal ? 
         PlayerGetter.all.find((p) => p.isLocal()) 
         : PlayerGetter.getByUCID(server, data.UCID);
@@ -245,7 +245,7 @@ Packet.on(PacketType.ISP_BTT, (data: IS_BTT, server: Server) => {
     }
 });
 
-Packet.on(PacketType.ISP_BFN, (data: IS_BFN, server: Server) => {
+Packet.on(PacketType.ISP_BFN, (data, server) => {
     const player = server.isLocal ? 
         PlayerGetter.all.find((p) => p.isLocal()) 
         : PlayerGetter.getByUCID(server, data.UCID);

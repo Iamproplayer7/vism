@@ -1,5 +1,5 @@
 import { CarFlags, PacketType } from "tsinsim";
-import { IS_CIM, IS_CNL, IS_CPR, IS_MST, IS_MTC, IS_NCI, IS_NCN, IS_PLC } from "tsinsim/packets";
+import { IS_MST, IS_MTC, IS_NCN, IS_PLC } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event, EventType } from "./Event.js";
 import { Server } from "./Server.js";
@@ -95,7 +95,7 @@ class PlayerInternal implements Player  {
         this.Local = data.Flags === 0;
         
         // additional player info
-        Packet.on(PacketType.ISP_NCI, (data: IS_NCI, server: Server) => {
+        Packet.on(PacketType.ISP_NCI, (data, server) => {
             if(server !== this.Server || data.UCID !== this.UCID) return;
         
             this.UserID = data.UserID;
@@ -106,7 +106,7 @@ class PlayerInternal implements Player  {
         }).bind(this);
 
         // player name change
-        Packet.on(PacketType.ISP_CPR, (data: IS_CPR, server: Server) => {
+        Packet.on(PacketType.ISP_CPR, (data, server) => {
             if(server !== this.Server || data.UCID !== this.UCID) return;
         
             const Name = this.Name;
@@ -115,7 +115,7 @@ class PlayerInternal implements Player  {
         }).bind(this);
         
         // player interface change
-        Packet.on(PacketType.ISP_CIM, (data: IS_CIM, server: Server) => {
+        Packet.on(PacketType.ISP_CIM, (data, server) => {
             if(server !== this.Server || data.UCID !== this.UCID) return;
         
             this.Interface = { Mode: data.Mode, SubMode: data.SubMode, SelType: data.SelType };
@@ -123,7 +123,7 @@ class PlayerInternal implements Player  {
         }).bind(this);
         
         // player disconnects
-        Packet.on(PacketType.ISP_CNL, (data: IS_CNL, server: Server) => {
+        Packet.on(PacketType.ISP_CNL, (data, server) => {
             if(server !== this.Server || data.UCID !== this.UCID) return;
         
             Event.fire(EventType.PLAYER_DISCONNECTED, this, data.Reason);
@@ -198,7 +198,7 @@ class PlayerInternal implements Player  {
 }
 
 // creating the player
-Packet.on(PacketType.ISP_NCN, (data: IS_NCN, server: Server) => {
+Packet.on(PacketType.ISP_NCN, (data, server) => {
     if(data.UCID === 0) return;
     
     const player = new PlayerInternal(data, server);

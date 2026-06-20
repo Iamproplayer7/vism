@@ -78,7 +78,7 @@ export class Layout {
     }
 }
 
-Packet.on(PacketType.ISP_AXM, (data: IS_AXM, server: Server) => {
+Packet.on(PacketType.ISP_AXM, (data, server) => {
     const player = PlayerGetter.getByUCID(server, data.UCID);
     if(!player) return;
 
@@ -91,7 +91,7 @@ Packet.on(PacketType.ISP_AXM, (data: IS_AXM, server: Server) => {
     }
 });
 
-Packet.on(PacketType.ISP_AXM, (data: IS_AXM, server: Server) => {
+Packet.on(PacketType.ISP_AXM, (data, server) => {
     if(data.PMOAction === PMOAction.PMO_TINY_AXM) {
         for(const layout of data.Info) {
             Layout.all.push(layout);

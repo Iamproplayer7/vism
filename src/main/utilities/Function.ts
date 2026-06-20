@@ -1,4 +1,4 @@
-import { Vector2 } from "tsinsim";
+import { Vector2, Vector3 } from "tsinsim";
 
 const Function = { 
     wait: (ms: number) => {
@@ -41,19 +41,19 @@ const Function = {
         const time = new Date().getTime();
         return Function.round(time / 1000, 0);
     },
-    distance2d: (vector1: { X: number, Y: number }, vector2: { X: number, Y: number }) => {
+    distance2d: (vector1: Vector2, vector2: Vector2) => {
         const r = Math.sqrt(
-            Math.pow(vector1.X - vector2.X, 2) +
-                Math.pow(vector1.Y - vector2.Y, 2)
+            Math.pow(vector1.x - vector2.x, 2) +
+                Math.pow(vector1.y - vector2.y, 2)
         ) / 1000;
     
         return (r < 0 ? 0 : r);
     },
-    distance3d: (vector1: { X: number, Y: number, Z: number }, vector2: { X: number, Y: number, Z: number }) => {
+    distance3d: (vector1: Vector3, vector2: Vector3) => {
         const r = Math.sqrt(
-            Math.pow(vector1.X - vector2.X, 2) +
-                Math.pow(vector1.Y - vector2.Y, 2) + 
-                    Math.pow(vector1.Z - vector2.Z, 2)
+            Math.pow(vector1.x - vector2.x, 2) +
+                Math.pow(vector1.y - vector2.y, 2) + 
+                    Math.pow(vector1.z - vector2.z, 2)
         ) / 1000;
     
         return (r < 0 ? 0 : r);
