@@ -1,4 +1,4 @@
-import { IS_ACR, IS_AIC, IS_AII, IS_AXI, IS_AXM, IS_AXO, IS_BFN, IS_BTC, IS_BTN, IS_BTT, IS_CCH, IS_CIM, IS_CNL, IS_CON, IS_CPP, IS_CPR, IS_CRS, IS_CSC, IS_FIN, IS_FLG, IS_HCP, IS_HLV, IS_III, IS_IPB, IS_ISM, IS_JRR, IS_LAP, IS_MAL, IS_MCI, IS_MOD, IS_MSL, IS_MSO, IS_MST, IS_MSX, IS_MTC, IS_NCI, IS_NCN, IS_NLP, IS_NPL, IS_OBH, IS_OCO, IS_PEN, IS_PFL, IS_PIT, IS_PLA, IS_PLC, IS_PLH, IS_PLL, IS_PLP, IS_PSF, IS_REO, IS_RES, IS_RIP, IS_RST, IS_SCC, IS_SCH, IS_SFP, IS_SLC, IS_SMALL, IS_SPX, IS_SSH, IS_STA, IS_TINY, IS_TOC, IS_TTC, IS_UCO, IS_VER, IS_VTN, PacketType, Sendable } from "tsinsim/packets";
+import { IS_ACR, IS_AIC, IS_AII, IS_AXI, IS_AXM, IS_AXO, IS_BFN, IS_BTC, IS_BTN, IS_BTT, IS_CCH, IS_CIM, IS_CNL, IS_CON, IS_CPP, IS_CPR, IS_CRS, IS_CSC, IS_FIN, IS_FLG, IS_HCP, IS_HLV, IS_III, IS_IPB, IS_ISM, IS_JRR, IS_LAP, IS_MAL, IS_MCI, IS_MOD, IS_MSL, IS_MSO, IS_MST, IS_MSX, IS_MTC, IS_NCI, IS_NCN, IS_NLP, IS_NPL, IS_OBH, IS_OCO, IS_PEN, IS_PFL, IS_PIT, IS_PLA, IS_PLC, IS_PLH, IS_PLL, IS_PLP, IS_PSF, IS_REO, IS_RES, IS_RIP, IS_RST, IS_SCC, IS_SCH, IS_SET, IS_SFP, IS_SLC, IS_SMALL, IS_SPX, IS_SSH, IS_STA, IS_TINY, IS_TOC, IS_TTC, IS_UCO, IS_VER, IS_VTN, PacketType, Sendable } from "tsinsim/packets";
 import { Server } from "./Server.js";
 import { Player } from "./Player.js";
 import { Vehicle } from "./Vehicle.js";
@@ -74,6 +74,7 @@ type PacketMap = {
     [PacketType.ISP_IPB]: IS_IPB;
     [PacketType.ISP_AIC]: IS_AIC;
     [PacketType.ISP_AII]: IS_AII;
+    [PacketType.ISP_SET]: IS_SET;
 };
 
 type WithServer<T> = [ data: T, server: Server ];
