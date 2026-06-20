@@ -147,7 +147,7 @@ class VehicleInternal implements Vehicle  {
         }).bind(this);
 
         // vehicle info update
-        Packet.on(PacketType.ISP_MCI, (data: IS_MCI, server: Server) => {
+        Packet.on(PacketType.ISP_MCI, (data, server) => {
             if(server !== this.Server) return;
 
             for(const CompCar of data.Info) {
@@ -164,7 +164,7 @@ class VehicleInternal implements Vehicle  {
         }).bind(this);
 
         // vehicle mass update
-        Packet.on(PacketType.ISP_PLH, (data: IS_PLH, server: Server) => {
+        Packet.on(PacketType.ISP_PLH, (data, server) => {
             if(server !== this.Server) return;
 
             for(const PlayerHCAP of data.HCaps) {
@@ -174,7 +174,7 @@ class VehicleInternal implements Vehicle  {
         }).bind(this);
 
         // vehicle mass update
-        Packet.on(PacketType.ISP_OBH, (data: IS_OBH, server: Server) => {
+        Packet.on(PacketType.ISP_OBH, (data, server) => {
             if(server !== this.Server) return;
             if(data.PLID !== this.PLID) return;
 
@@ -182,7 +182,7 @@ class VehicleInternal implements Vehicle  {
         }).bind(this);
 
         // vehicle pit stop start
-        Packet.on(PacketType.ISP_PIT, (data: IS_PIT, server: Server) => {
+        Packet.on(PacketType.ISP_PIT, (data, server) => {
             if(server !== this.Server) return;
             if(data.PLID !== this.PLID) return;
 
@@ -190,15 +190,23 @@ class VehicleInternal implements Vehicle  {
         }).bind(this);
 
         // vehicle pit stop end
-        Packet.on(PacketType.ISP_PSF, (data: IS_PSF, server: Server) => {
+        Packet.on(PacketType.ISP_PSF, (data, server) => {
             if(server !== this.Server) return;
             if(data.PLID !== this.PLID) return;
 
             Event.fire(EventType.VEHICLE_PIT_STOP_END, this);
         }).bind(this);
 
+         // vehicle pit stop end
+        Packet.on(PacketType.ISP_PEN, (data, server) => {
+            if(server !== this.Server) return;
+            if(data.PLID !== this.PLID) return;
+
+            Event.fire(EventType.VEHICLE_PENALTY, this, { old: data.OldPen, new: data.NewPen, reason: data.Reason });
+        }).bind(this);
+
         // AI info packet
-        Packet.on(PacketType.ISP_AII, (data: IS_AII, server: Server) => {
+        Packet.on(PacketType.ISP_AII, (data, server) => {
             if(server !== this.Server) return;
             if(data.PLID !== this.PLID) return;
 
@@ -286,7 +294,7 @@ class VehicleInternal implements Vehicle  {
 }
 
 // creating the vehicle
-Packet.on(PacketType.ISP_NPL, (data: IS_NPL, server: Server) => {
+Packet.on(PacketType.ISP_NPL, (data, server) => {
     const player = PlayerGetter.getByUCID(server, data.UCID); 
     if(!player) return;
 
