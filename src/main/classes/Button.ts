@@ -27,11 +27,14 @@ type SimpleButtonAdd = {
 }
 
 type ClickButtonAdd = {
-    Callback: (flags: number) => void, Inst?: number
+    Callback?: (flags: number) => void, 
+    Inst?: number
 }
 
 type InputButtonAdd = {
-    Text2?: string, TypeIn?: number, Callback: (text: string) => void
+    Text2?: string, 
+    TypeIn?: number, 
+    Callback?: (text: string) => void
 }
 
 // STATIC CLASS
@@ -165,7 +168,6 @@ export class Button {
         if(!this.valid) return;
 
         // generate ClickID
-       
         if(this.ClickID === -1) {
             for(var i = 0; i < 200; i++) {
                 if(this.ClickID === -1 && !Button.getByUCIDClickID(this.Server, this.Player.getUCID(), i)) {
@@ -178,7 +180,6 @@ export class Button {
             }
         }
     
-        
         const packet = new IS_BTN;
         packet.UCID = this.Server.isLocal ? 0 : this.Player.getUCID();
         packet.ReqI = this.ClickID + 1;
@@ -188,10 +189,10 @@ export class Button {
         packet.TypeIn = this.TypeIn ? this.TypeIn : (this.Type == ButtonType.INPUT ? 95 : 0);
         packet.W = this.Width;
         packet.H = this.Height;
-        packet.T = this.Top;
-        packet.L = this.Left;
+        packet.T = this.Top > 200 ? 200 : this.Top;
+        packet.L = this.Left > 200 ? 200 : this.Left;
 
-        packet.Text = this.Text2 != '' ? "\0" + this.Text2 + "\0" + this.Text : this.Text;
+        packet.Text = (this.Text2 != '' ? `\0${this.Text2}\0` : '') + this.Text;
 
         this.Server.InSimHandle?.sendPacket(packet);
     }
