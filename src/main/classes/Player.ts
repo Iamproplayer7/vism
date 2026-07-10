@@ -43,7 +43,7 @@ export interface Player {
     getUsername(): string;
     isAdmin(): boolean;
     getLanguage(): number;
-    getIpAdress(): string;
+    getIpAddress(): string;
 
     getVehicle(): Vehicle | false;
     setVehicle(vehicle: Vehicle | false): void;
@@ -78,7 +78,7 @@ class PlayerInternal implements Player  {
 
     private UserID: number = 0;
     private Language: number = 0;
-    private IpAdress: string = '0.0.0.0';
+    private IpAddress: string = '0.0.0.0';
 
     private Vehicle: Vehicle | false = false;
     private AIVehicles: Vehicle[] = [];
@@ -100,7 +100,7 @@ class PlayerInternal implements Player  {
         
             this.UserID = data.UserID;
             this.Language = data.Language;
-            this.IpAdress = data.IpAddress;
+            this.IpAddress = data.IpAddress;
 
             Event.fire(EventType.PLAYER_CONNECTED, this);
         }).bind(this);
@@ -142,7 +142,7 @@ class PlayerInternal implements Player  {
     getUsername()                { return this.Username;  };
     isAdmin()                    { return this.Admin;     };
     getLanguage()                { return this.Language;  };
-    getIpAdress()                { return this.IpAdress;  };
+    getIpAddress()                { return this.IpAddress;  };
     getVehicle()                 { return this.Vehicle;   };
     setVehicle(vehicle: Vehicle) { this.Vehicle = vehicle; }
     getAIVehicles()                 { return this.AIVehicles;   };
