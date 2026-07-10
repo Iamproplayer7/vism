@@ -10,39 +10,33 @@ export enum ButtonType {
     INPUT
 }
 
-type SimpleButton = {
-    Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Style: ButtonStyle, Inst?: number
-}
+type BaseButton = {
+    Name: string;
+    Group: string;
+    Width: number;
+    Height: number;
+    Top: number;
+    Left: number;
+    Text: string;
+    Style: ButtonStyle;
+};
 
-type ClickButton = {
-    Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Style: ButtonStyle, Callback: (flags: number) => void, Inst?: number
-}
 
-type InputButton = {
-    Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Text2?: string, TypeIn?: number, Style: ButtonStyle, Callback: (text: string) => void
-}
+type SimpleButtonData = { Inst?: number }
+type ClickButtonData = { Callback?: (flags: number) => void; Inst?: number }
+type InputButtonData = { Caption?: string;  Copy?: boolean; TypeIn?: number; Callback?: (text: string) => void }
 
-type SimpleButtonAdd = {
-    Inst?: number
-}
+type SimpleButton = BaseButton & SimpleButtonData;
+type ClickButton = BaseButton & ClickButtonData;
+type InputButton = BaseButton & InputButtonData;
 
-type ClickButtonAdd = {
-    Callback?: (flags: number) => void, 
-    Inst?: number
-}
-
-type InputButtonAdd = {
-    Text2?: string, 
-    TypeIn?: number, 
-    Callback?: (text: string) => void
-}
 
 // STATIC CLASS
 export class Button {
     // STATIC START
     static all: Button[] = [];
 
-    static create(type: ButtonType, player: Player, Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Style: number, data?: SimpleButtonAdd | ClickButtonAdd | InputButtonAdd): Button {
+    static create(type: ButtonType, player: Player, Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Style: number, data?: SimpleButtonData | ClickButtonData | InputButtonData): Button {
         const button = Button.getByUCIDNameGroup(player.getServer(), player.getUCID(), Name, Group);
         if(button) {
             return button.update({ Width, Height, Top, Left, Text, Style, ...data });
@@ -83,7 +77,7 @@ export class Button {
         return Button.getByUCID(server, UCID).find((button) => button.valid && button.ClickID === ClickID);
     }
 
-    static update(player: Player, Name: string, Group: string, data: Partial<SimpleButton> | Partial<InputButton> | Partial<InputButton>) {
+    static update(player: Player, Name: string, Group: string, data: Partial<SimpleButton> | Partial<ClickButton> | Partial<InputButton>) {
         const button = Button.getByPlayerNameGroup(player, Name, Group);
         if(button) {
             button.update(data);
@@ -119,13 +113,14 @@ export class Button {
     Top: number = 0;
     Left: number = 0;
     Text: string = '';
-    Text2: string = '';
+    Caption: string = '';
     TypeIn: number = 0;
     Style: number = 0;
 
     
     Callback: (arg1: string) => void = (arg1: string) => { };
     Inst: number = 0;
+    Copy: boolean = false;
 
     constructor(type: ButtonType, player: Player, data: SimpleButton | ClickButton | InputButton) {
         // base
@@ -135,7 +130,7 @@ export class Button {
         this.Player = player;
         this.ClickID = -1; 
 
-        this.Text2 = '';
+        this.Caption = '';
 
         Object.assign(this, { ...data });
 
@@ -148,7 +143,7 @@ export class Button {
             const key = k as keyof typeof data;
             const value = data[key];
             
-            if(['Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Text2', 'TypeIn'].includes(key)) {
+            if(['Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Caption', 'TypeIn'].includes(key)) {
                 if(this[key] !== value) {
                     this[key] = value as never;
                     updated = true;
@@ -186,13 +181,14 @@ export class Button {
         packet.ClickID = this.ClickID;
         packet.Inst = this.Inst;
         packet.BStyle = this.Style + (this.Type == ButtonType.CLICK || this.Type == ButtonType.INPUT ? 8 : 0);
-        packet.TypeIn = this.TypeIn ? this.TypeIn : (this.Type == ButtonType.INPUT ? 95 : 0);
+        packet.TypeIn = this.Copy ? (95 | 128) : (this.TypeIn ? this.TypeIn : (this.Type == ButtonType.INPUT ? 95 : 0));
+        
         packet.W = this.Width;
         packet.H = this.Height;
         packet.T = this.Top > 200 ? 200 : this.Top;
         packet.L = this.Left > 200 ? 200 : this.Left;
 
-        packet.Text = (this.Text2 != '' ? `\0${this.Text2}\0` : '') + this.Text;
+        packet.Text = (this.Caption != '' ? `\0${this.Caption}\0` : '') + this.Text;
 
         this.Server.InSimHandle?.sendPacket(packet);
     }
