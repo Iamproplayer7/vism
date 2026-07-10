@@ -184,7 +184,7 @@ export class Menu {
     setInterval(callback: () => void, ms: number) {
         this.clearInterval();
 
-        this.IntervalName = 'menu-' + this.Group + '-interval';
+        this.IntervalName = `menu-${this.Group}-player-${this.Player.getUCID()}-interval`;
         Interval.set(this.IntervalName, callback, ms, false).bind(this);
         
     }
@@ -325,7 +325,7 @@ export class MenuButton {
         }
 
         if(this.Type === MenuButtonType.BUTTON_INPUT) {
-            Button.create(ButtonType.INPUT, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { TypeIn: this.TypeIn, Text2: this.TextInput, Callback: (text: string) => {
+            Button.create(ButtonType.INPUT, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { TypeIn: this.TypeIn, Caption: this.TextInput, Callback: (text: string) => {
                 if(this.Callback) {
                     this.Callback(this, text);
                 }
