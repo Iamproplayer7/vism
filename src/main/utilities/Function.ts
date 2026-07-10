@@ -41,6 +41,20 @@ const Function = {
         const time = new Date().getTime();
         return Function.round(time / 1000, 0);
     },
+    timeToHis: (time: number) => {
+        const days = Math.floor(time / 86400);
+        const hours = Math.floor(time % 86400 / 3600);
+        const minutes = Math.floor(time / 60 % 60);
+        const seconds = Math.floor(time % 60);
+
+        var text = '';
+        text += (days > 0 ? days + ' d. ' : '');
+        text += ((days > 0 || hours > 0) ? hours + ' h. ' : '');
+        text += ((days > 0 || hours > 0 || minutes > 0) ? minutes + ' m. ' : '');
+        text += ((days > 0 || hours > 0 || minutes > 0 || seconds > 0) ? seconds + ' s.' : '');
+
+        return text;
+    },
     distance2d: (vector1: Vector2, vector2: Vector2) => {
         const r = Math.sqrt(
             Math.pow(vector1.x - vector2.x, 2) +
