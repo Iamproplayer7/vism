@@ -22,7 +22,7 @@ export const PlayerGetter = {
     },
 
     getByHalfUsername(server: Server, Username: string) {
-        const players = this.all.filter((player) => player.getServer() === server && Username.length >= 3 && player.getUsername().toLowerCase().includes(Username));
+        const players = this.all.filter((player) => player.getServer() === server && Username.length >= 3 && player.getUsername().toLowerCase().includes(Username.toLowerCase()));
         return players.length < 1 ? false : (players.length == 1 ? players[0] : players);
     },
 
