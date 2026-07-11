@@ -45,7 +45,14 @@ export const Server = {
         // handle InSim events
         InSimHandle.onGlobal((name, data) => {
             for(const packet of Packet.all.filter((packet) => packet.name === name)) {
+                const start = performance.now();
                 packet.callback(data, ServerObject);
+                const end = performance.now();
+                const diff = end-start;
+                
+                if(diff > 10) {
+                    console.log(`[Packet] ${packet.name} exceeded callback threshold. (${diff}/10 ms)`)
+                }
             }
         });
 
