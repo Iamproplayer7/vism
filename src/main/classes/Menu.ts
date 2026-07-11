@@ -171,6 +171,18 @@ export class Menu {
         return menuButton;
     }
 
+    text(Text: string = '') {
+        return this.addButton(MenuButtonType.BUTTON_TEXT, Text);
+    }
+
+    click(Text: string = '', Callback: (button: MenuButton, flags: string) => void) {
+        return this.addButton(MenuButtonType.BUTTON_CLICK, Text, Callback);
+    }
+
+    input(Text: string = '', Callback: (button: MenuButton, text: string) => void) {
+        return this.addButton(MenuButtonType.BUTTON_INPUT, Text, Callback);
+    }
+
     createButtonSpace() {
         return this.addButton(MenuButtonType.BUTTON_SPACE);
     }
@@ -294,6 +306,10 @@ export class MenuButton {
         }
     }
 
+    getMenu() {
+        return this.Menu;
+    }
+
     draw(Width: number, Top: number, Left: number): number {
         if(!this.valid || !this.Menu.valid) return 0;
         this.recalculateHeight();
@@ -398,6 +414,22 @@ export class MenuButton {
         this.Menu.draw();
 
         return this;
+    }
+
+    text(Text: string) {
+        return this.Menu.text(Text);
+    }
+
+    click(Text: string, Callback: (button: MenuButton, flags: string) => any) {
+        return this.Menu.click(Text, Callback);
+    }
+
+    input(Text: string, Callback: (button: MenuButton, text: string) => any) {
+        return this.Menu.input(Text, Callback);
+    }
+
+    space() {
+        return this.Menu.createButtonSpace();
     }
 
     delete() {
