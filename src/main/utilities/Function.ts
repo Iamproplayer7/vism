@@ -51,7 +51,7 @@ const Function = {
         text += (days > 0 ? days + ' d. ' : '');
         text += ((days > 0 || hours > 0) ? hours + ' h. ' : '');
         text += ((days > 0 || hours > 0 || minutes > 0) ? minutes + ' m. ' : '');
-        text += ((days > 0 || hours > 0 || minutes > 0 || seconds > 0) ? seconds + ' s.' : '');
+        text += seconds + ' s.';
 
         return text;
     },
