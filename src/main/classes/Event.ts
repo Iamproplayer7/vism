@@ -96,8 +96,15 @@ export const Event = {
         const entries = this.all.filter((entry) => entry.name === name);
         entries.sort((a, b) => Number(b.priority) - Number(a.priority))
         
-        entries.forEach((entry) => {
+        for(const entry of entries) {
+            const start = performance.now();
             entry.callback(...args);
-        });
+            const end = performance.now();
+            const diff = end-start;
+
+            if(diff > 10) {
+                console.log(`[Event] ${entry.name} exceeded callback threshold. (${diff}/10 ms)`)
+            }
+        }
     }
 };
