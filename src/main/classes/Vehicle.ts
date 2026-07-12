@@ -1,5 +1,5 @@
 import { JRRAction, PacketType, PlayerHCapFlags, Vector3 } from "tsinsim";
-import { IS_AII, IS_JRR, IS_MCI, IS_MST, IS_NPL, IS_OBH, IS_PIT, IS_PLH, IS_PLL, IS_PLP, IS_PSF, ObjectInfo, OSMain, PlayerHCap } from "tsinsim/packets";
+import { IS_JRR, IS_MST, IS_NPL, IS_PLH, ObjectInfo, OSMain, PlayerHCap } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event, EventType } from "./Event.js";
 import { Player, PlayerGetter } from "./Player.js";
@@ -173,7 +173,7 @@ class VehicleInternal implements Vehicle  {
             }
         }).bind(this);
 
-        // vehicle mass update
+        // vehicle hit object
         Packet.on(PacketType.ISP_OBH, (data, server) => {
             if(server !== this.Server) return;
             if(data.PLID !== this.PLID) return;
@@ -312,4 +312,15 @@ Packet.on(PacketType.ISP_NPL, (data, server) => {
     
     VehicleGetter.all.push(vehicle);
     Event.fire(EventType.VEHICLE_CREATED, vehicle, player);
+});
+
+// vehicle contact
+Packet.on(PacketType.ISP_CON, (data, server) => {
+    const veh1 = VehicleGetter.getByPLID(server, data.A.PLID);
+    const veh2 = VehicleGetter.getByPLID(server, data.B.PLID);
+
+    if(veh1 && veh2) {
+        Event.fire(EventType.VEHICLE_CONTACT, veh1, veh2);
+        Event.fire(EventType.VEHICLE_CONTACT, veh2, veh1);
+    }
 });

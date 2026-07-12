@@ -19,6 +19,7 @@ export enum EventType {
     VEHICLE_JOIN_REQUEST,
     VEHICLE_UPDATE,
     VEHICLE_HIT_OBJECT,
+    VEHICLE_CONTACT,
     VEHICLE_PIT_STOP_START,
     VEHICLE_PIT_STOP_END,
     VEHICLE_PENALTY,
@@ -50,6 +51,7 @@ type EventMap = {
     [EventType.VEHICLE_JOIN_REQUEST]: [ player: Player, data: IS_NPL ];
     [EventType.VEHICLE_UPDATE]: [ vehicle: Vehicle ];
     [EventType.VEHICLE_HIT_OBJECT]: [ vehicle: Vehicle, index: ObjectIndex, speed: CarContOBJ['Speed'] ];
+    [EventType.VEHICLE_CONTACT]: [ vehicle: Vehicle, vehicle2: Vehicle ];
     [EventType.VEHICLE_PIT_STOP_START]: [ vehicle: Vehicle ];
     [EventType.VEHICLE_PIT_STOP_END]: [ vehicle: Vehicle ];
     [EventType.VEHICLE_PENALTY]: [ vehicle: Vehicle, { old: PenaltyValue, new: PenaltyValue, reason: PenaltyReason } ];
