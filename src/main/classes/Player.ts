@@ -189,7 +189,7 @@ class PlayerInternal implements Player  {
             flags += vehFlag;
         }
 
-        this.Server.InSimHandle?.sendPacket(new IS_PLC({ UCID: 255, Cars: flags }))
+        Packet.send(this.Server, new IS_PLC({ UCID: 255, Cars: flags }))
     }
 
     addAIVehicle(vehicle: Vehicle) { 

@@ -190,7 +190,7 @@ export class Button {
 
         packet.Text = (this.Caption != '' ? `\0${this.Caption}\0` : '') + this.Text;
 
-        this.Server.InSimHandle?.sendPacket(packet);
+        Packet.send(this.Server, packet);
     }
 
     delete() {
@@ -199,7 +199,7 @@ export class Button {
         this.valid = false;
         Button.all = Button.all.filter((button) => button !== this);
 
-        this.Server.InSimHandle?.sendPacket(new IS_BFN({ SubT: ButtonFunction.BFN_DEL_BTN, UCID: this.Player.getUCID(), ClickID: this.ClickID }));
+        Packet.send(this.Server, new IS_BFN({ SubT: ButtonFunction.BFN_DEL_BTN, UCID: this.Player.getUCID(), ClickID: this.ClickID }));
     }
 }
 
@@ -255,7 +255,7 @@ Packet.on(PacketType.ISP_BFN, (data, server) => {
     }
 
     // clear again
-    server.InSimHandle?.sendPacket(new IS_BFN({ SubT: ButtonFunction.BFN_CLEAR, UCID: data.UCID }));
+    Packet.send(server, new IS_BFN({ SubT: ButtonFunction.BFN_CLEAR, UCID: data.UCID }));
 
     Event.fire(EventType.BUTTON_CLEAR, player);
 });
