@@ -34,11 +34,11 @@ export const Server = {
             },
         
             message(text, sound) {
-                this.InSimHandle.sendPacket(new IS_MTC({ UCID: 255, Text: text, Sound: sound ?? 0 }));
+                Packet.send(this, new IS_MTC({ UCID: 255, Text: text, Sound: sound ?? 0 }));
             },
         
             command(text: string) {
-                this.InSimHandle.sendPacket(new IS_MST({ Msg: text }));
+                Packet.send(this, new IS_MST({ Msg: text }));
             }
         }
 

@@ -273,11 +273,11 @@ class VehicleInternal implements Vehicle  {
             }) 
         });
         
-        this.getServer().InSimHandle.sendPacket(packet);
+        Packet.send(this.Server, packet);
     }
 
     setMass(mass: number) {
-        this.getServer().InSimHandle.sendPacket(new IS_PLH({
+        Packet.send(this.Server, new IS_PLH({
             HCaps: [ new PlayerHCap( {
                 PLID: this.PLID,
                 Flags: PlayerHCapFlags.MASS,
@@ -287,7 +287,7 @@ class VehicleInternal implements Vehicle  {
     }
 
     removeFromTrack() {
-        this.getServer().InSimHandle.sendPacket(new IS_MST( {
+        Packet.send(this.getServer(), new IS_MST( {
             Msg: '/spec ' + (this.isAI ? this.PName : this.getPlayer().getUsername()),
         }));
     }

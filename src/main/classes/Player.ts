@@ -167,19 +167,19 @@ class PlayerInternal implements Player  {
     }
 
     message(text: string, sound?: number) {
-        this.Server.InSimHandle.sendPacket(new IS_MTC({ UCID: this.UCID, Text: text, Sound: sound ?? 0 }));
+        Packet.send(this.Server, new IS_MTC({ UCID: this.UCID, Text: text, Sound: sound ?? 0 }));
     }
 
     kick(text: string = '') {
         if(text == '') {
-            return this.Server.InSimHandle.sendPacket(new IS_MST({ Msg: '/kick ' + this.Username }));
+            return Packet.send(this.Server, new IS_MST({ Msg: '/kick ' + this.Username }));
         }
 
         this.message(text);
 
         setTimeout(() => {
             if(!this.valid) return;
-            this.Server.InSimHandle.sendPacket(new IS_MST({ Msg: '/kick ' + this.Username }));
+            Packet.send(this.Server, new IS_MST({ Msg: '/kick ' + this.Username }));
         }, 100);
     }
 

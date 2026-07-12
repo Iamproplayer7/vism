@@ -88,14 +88,6 @@ export const Packet = {
     number: 0,
 
     on<T extends keyof PacketMap>(name: T, callback: CallbackFnR<T>) {
-        /*if(Array.isArray(name)) {
-            for(const n of name) {
-                const packetId = Packet.number++;
-                this.all.push({ id: packetId, name: n, callback: callback as any, bind: null })
-                idsOfHandlers.push(packetId);
-            }
-        }*/
-        
         const packetId = Packet.number++;
 
         const cb = callback as CallbackFnR<T>;
