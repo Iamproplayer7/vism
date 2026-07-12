@@ -2,6 +2,7 @@ import { IS_ACR, IS_AIC, IS_AII, IS_AXI, IS_AXM, IS_AXO, IS_BFN, IS_BTC, IS_BTN,
 import { Server } from "./Server.js";
 import { Player } from "./Player.js";
 import { Vehicle } from "./Vehicle.js";
+import Function from "@main/utilities/Function.js";
 
 type PacketMap = {
     [PacketType.ISP_NONE]: {};
@@ -85,6 +86,7 @@ type Entity = Player | Server | Vehicle | null;
 
 export const Packet = {
     all: [] as Packet<keyof PacketMap>[],
+    logs: {} as { [key: string]: { times: number, lastCall: number }},
     number: 0,
 
     on<T extends keyof PacketMap>(name: T, callback: CallbackFnR<T>) {
@@ -119,6 +121,14 @@ export const Packet = {
     },
 
     send(server: Server, packet: Sendable) {
+        const name = packet.constructor.name;
+        if(this.logs[name] === undefined) {
+            this.logs[name] = { times: 0, lastCall: 0 };
+        }
+
+        this.logs[name].times++;
+        this.logs[name].lastCall = Function.time();
+
         server.InSimHandle.sendPacket(packet);
     }
 }
