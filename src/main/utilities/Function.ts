@@ -12,10 +12,7 @@ const Function = {
         return Math.round(int * Math.pow(10, places)) / Math.pow(10, places);
     },
     random: (min: number, max: number) => {
-        min = min*10;
-        max = max*10;
-
-        return Math.floor(Math.floor(Math.random() * (max - min) + min) / 10);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     },
     date: (format: string, time: number | false = false) => {
         const DATE = time ? new Date(time * 1000) : new Date();
