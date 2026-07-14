@@ -130,6 +130,7 @@ class PlayerInternal implements Player  {
             this.valid = false;
 
             Packet.offByBind(this);
+            Interval.clearByBind(this);
             PlayerGetter.all = PlayerGetter.all.filter((player) => player !== this);
         }).bind(this);
     }
@@ -150,6 +151,7 @@ class PlayerInternal implements Player  {
        
     setInterval(name: string, callback: () => void, ms: number) {
         Interval.set(`player-${this.getUCID()}-${name}`, () => {
+            if(!this.valid) return this.clearInterval(name);
             callback();
         }, ms).bind(this);
     };
