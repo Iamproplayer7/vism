@@ -1,4 +1,4 @@
-import { JRRAction, PacketType, PlayerHCapFlags, Vector3 } from "tsinsim";
+import { JRRAction, PacketType, PenaltyReason, PlayerHCapFlags, Vector3 } from "tsinsim";
 import { IS_JRR, IS_MST, IS_NPL, IS_PLH, ObjectInfo, OSMain, PlayerHCap } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event, EventType } from "./Event.js";

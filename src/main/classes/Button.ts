@@ -92,6 +92,8 @@ export class Button {
     }
 
     static deleteGroup(player: Player, Group: string) {
+        Event.fire(EventType.BUTTON_GROUP_DELETE, player, Group);
+        
         const buttons = Button.getByPlayerGroup(player, Group);
         for(const button of buttons) {
             button.delete();

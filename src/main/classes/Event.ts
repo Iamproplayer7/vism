@@ -30,6 +30,7 @@ export enum EventType {
     BUTTON_CLICK,
     BUTTON_INPUT,
     BUTTON_CLEAR,
+    BUTTON_GROUP_DELETE,
 
     PLAYER_LAYOUT_ADD,
     PLAYER_LAYOUT_REMOVE
@@ -62,6 +63,7 @@ type EventMap = {
     [EventType.BUTTON_CLICK]: [ button: Button, player: Player, flags: 0 | ButtonClickFlags ];
     [EventType.BUTTON_INPUT]: [ button: Button, player: Player, text: string ];
     [EventType.BUTTON_CLEAR]: [ player: Player ];
+    [EventType.BUTTON_GROUP_DELETE]: [ player: Player, name: string ];
 
     [EventType.PLAYER_LAYOUT_ADD]: [ player: Player, data: ObjectInfo[] ];
     [EventType.PLAYER_LAYOUT_REMOVE]: [ player: Player, data: ObjectInfo[] ];
@@ -104,8 +106,8 @@ export const Event = {
             const end = performance.now();
             const diff = end-start;
 
-            if(diff > 10) {
-                console.log(`[Event] ${entry.name} exceeded callback threshold. (${diff}/10 ms)`)
+            if(diff > 20) {
+                console.log(`[Event] ${entry.name} exceeded callback threshold. (${Math.floor(diff)}/10 ms)`)
             }
         }
     }

@@ -50,8 +50,8 @@ export const Server = {
                 const end = performance.now();
                 const diff = end-start;
                 
-                if(diff > 10) {
-                    console.log(`[Packet] ${packet.name} exceeded callback threshold. (${diff}/10 ms)`)
+                if(diff > 20) {
+                    console.log(`[Packet] ${packet.name} exceeded callback threshold. (${Math.floor(diff)}/20 ms)`)
                 }
             }
         });
