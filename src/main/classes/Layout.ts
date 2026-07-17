@@ -5,8 +5,12 @@ import { PMOAction, PMOFlags } from "tsinsim";
 import { Event, EventType } from "./Event.js";
 import { PlayerGetter } from "./Player.js";
 
-const MAX_LAYOUT = 3000;
+const MAX_LAYOUT = 3600;
 type CALLBACK = ((status: boolean, layout: ObjectInfo) => void) | null;
+
+const isSameObjectInfo = (a: ObjectInfo | Partial<ObjectInfo>, b: ObjectInfo) => {
+    return a.X === b.X && a.Y === b.Y && a.ZByte === b.ZByte && a.Flags === b.Flags && a.Index === b.Index && a.Heading === b.Heading;
+}
 
 export class Layout {
     // STATIC START
@@ -105,13 +109,12 @@ Packet.on(PacketType.ISP_AXM, (data, server) => {
     if(data.PMOAction === PMOAction.PMO_ADD_OBJECTS) {
         var added = 0;
         for(const layoutToAdd of data.Info) {
-            const layoutExists = Layout.all.some((l) => JSON.stringify(l) === JSON.stringify(layoutToAdd));
-            const exceededMaximumLayoutLength = Layout.all.length >= MAX_LAYOUT;
-            const couldLayoutBeAdded = !layoutExists && !exceededMaximumLayoutLength;
+            const layoutExists = Layout.all.some((l) => isSameObjectInfo(l, layoutToAdd));
+            const couldLayoutBeAdded = !layoutExists && Layout.all.length < MAX_LAYOUT;
 
             for(const layoutForWait of Layout.waitForAdd) {
                 const { callback, ...layoutForWaitWithoutCallback } = layoutForWait;
-                if(JSON.stringify(layoutForWaitWithoutCallback) === JSON.stringify(layoutToAdd)) {
+                if(isSameObjectInfo(layoutForWaitWithoutCallback, layoutToAdd)) {
                     callback(couldLayoutBeAdded, layoutToAdd);
                 }
             }
@@ -125,11 +128,11 @@ Packet.on(PacketType.ISP_AXM, (data, server) => {
 
     if(data.PMOAction === PMOAction.PMO_DEL_OBJECTS) {
         for(const layoutToRemove of data.Info) {
-            const layoutExists = Layout.all.some((l) => JSON.stringify(l) === JSON.stringify(layoutToRemove));
-            
+            const layoutExists = Layout.all.some((l) => isSameObjectInfo(l, layoutToRemove));
+
             for(const layoutForWait of Layout.waitForRemove) {
                 const { callback, ...layoutForWaitWithoutCallback } = layoutForWait;
-                if(JSON.stringify(layoutForWaitWithoutCallback) === JSON.stringify(layoutToRemove)) {
+                if(isSameObjectInfo(layoutForWaitWithoutCallback, layoutToRemove)) {
                     callback(layoutExists, layoutToRemove);
                 }
             }
