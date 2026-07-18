@@ -103,8 +103,7 @@ export const Event = {
         for(const entry of entries) {
             const start = performance.now();
             entry.callback(...args);
-            const end = performance.now();
-            const diff = end-start;
+            const diff = performance.now()-start;
 
             if(diff > 20) {
                 console.log(`[Event] ${entry.name} exceeded callback threshold. (${Math.floor(diff)}/10 ms)`)

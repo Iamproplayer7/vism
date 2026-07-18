@@ -1,5 +1,5 @@
 import { InSim, InSimFlags } from "tsinsim";
-import { IS_ISI, IS_MST, IS_MTC } from "tsinsim/packets";
+import { IS_ISI, IS_MST, IS_MTC, PacketType } from "tsinsim/packets";
 import { Packet } from "./Packet.js";
 import { Event, EventType } from "./Event.js";
 
@@ -47,11 +47,10 @@ export const Server = {
             for(const packet of Packet.all.filter((packet) => packet.name === name)) {
                 const start = performance.now();
                 packet.callback(data, ServerObject);
-                const end = performance.now();
-                const diff = end-start;
+                const diff = performance.now()-start;
                 
                 if(diff > 20) {
-                    console.log(`[Packet] ${packet.name} exceeded callback threshold. (${Math.floor(diff)}/20 ms)`)
+                    console.log(`[Packet] ${PacketType[packet.name]} exceeded callback threshold. (${Math.floor(diff)}/20 ms)`)
                 }
             }
         });
