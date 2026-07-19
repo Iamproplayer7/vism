@@ -11,6 +11,7 @@ export enum ButtonType {
 }
 
 type BaseButton = {
+    Type: ButtonType;
     Name: string;
     Group: string;
     Width: number;
@@ -39,7 +40,7 @@ export class Button {
     static create(type: ButtonType, player: Player, Name: string, Group: string, Width: number, Height: number, Top: number, Left: number, Text: string, Style: number, data?: SimpleButtonData | ClickButtonData | InputButtonData): Button {
         const button = Button.getByUCIDNameGroup(player.getServer(), player.getUCID(), Name, Group);
         if(button) {
-            return button.update({ Width, Height, Top, Left, Text, Style, ...data });
+            return button.update({ Type: type, Width, Height, Top, Left, Text, Style, ...data });
         }
         
         const newButton = new Button(type, player, { Name, Group, Width, Height, Top, Left, Text, Style, ...data } as SimpleButton | InputButton | ClickButton);
@@ -104,7 +105,7 @@ export class Button {
     // DEFAULT VALUES
     valid: boolean = false;
     readonly Server: Server;
-    readonly Type: number;
+    Type: number;
     readonly Player: Player;
     ClickID: number;
 
@@ -145,7 +146,7 @@ export class Button {
             const key = k as keyof typeof data;
             const value = data[key];
             
-            if(['Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Caption', 'TypeIn'].includes(key)) {
+            if(['Type', 'Width', 'Height', 'Top', 'Left', 'Text', 'Style', 'Caption', 'TypeIn'].includes(key)) {
                 if(this[key] !== value) {
                     this[key] = value as never;
                     updated = true;
