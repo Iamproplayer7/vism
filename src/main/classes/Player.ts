@@ -55,6 +55,7 @@ export interface Player {
 
     kick(text: string): void;
     message(text: string, sound?: number): void;
+    serverMessage(text: string, sound?: number): void;
 
     // interval
     setInterval(name: string, callback: () => void, ms: number, fireWhenCreated?: boolean): void;
@@ -170,6 +171,10 @@ class PlayerInternal implements Player  {
 
     message(text: string, sound?: number) {
         Packet.send(this.Server, new IS_MTC({ UCID: this.UCID, Text: text, Sound: sound ?? 0 }));
+    }
+
+    serverMessage(text: string, sound?: number) {
+        Packet.send(this.Server, new IS_MTC({ UCID: 255, Text: text, Sound: sound ?? 0 }));
     }
 
     kick(text: string = '') {
