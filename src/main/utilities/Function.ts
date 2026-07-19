@@ -121,7 +121,7 @@ const Function = {
         return heading;
     },
     
-    getScreenCoordFromWorldCoord(v1: Vector2, v2: Vector2, heading: number) {
+    /*getScreenCoordFromWorldCoord(v1: Vector2, v2: Vector2, heading: number) {
         var headingInDegrees = this.getHeadingByCoord(v1, v2, heading);
     
         headingInDegrees -= 180;    
@@ -160,6 +160,87 @@ const Function = {
         }
         
         return { top: top < 0 ? 0 : top > 200 ? 200 : top, left: left < 0 ? 0 : left > 200 ? 200 : left };
+    },*/
+    getScreenCoordFromWorldCoord(v1: Vector2, v2: Vector2, heading: number, padding = 50) {
+        const angle = this.getHeadingByCoord(v1, v2, heading) - 180;
+        const rad = angle * Math.PI / 180;
+
+        // dimensions
+        const size = 200;
+        const half = size / 2;
+
+        // direction
+        const dx = -Math.sin(rad);
+        const dy = Math.cos(rad);
+
+        // apply padding
+        const limit = half - padding;
+
+        // scale to edge
+        const scale = limit / Math.max(Math.abs(dx), Math.abs(dy));
+
+        return {
+            left: half + dx * scale,
+            top: half + dy * scale,
+        };
+    },
+    getShortName(fullName: string) {
+        const LENGTH = 4;
+
+        if (fullName.length <= LENGTH) {
+            // Official LFS car (3 chars), 4-char mod name, or an invalid name.
+            return fullName;
+        }
+
+        for (const separator of [" ", "_"]) {
+            // If the name contains spaces, don't also try splitting on underscores.
+            if (separator === "_" && fullName.includes(" ")) {
+                continue;
+            }
+
+            let shortName = "";
+            const splitName = fullName
+                .split(separator)
+                .filter(part => part.length > 0);
+
+            // First pass: take the first character of each word.
+            for (const wordRaw of splitName) {
+                const word = wordRaw.replace(/^[_-]+/, "");
+                if (word.length === 0) {
+                    continue;
+                }
+
+                shortName += word[0];
+
+                if (shortName.length >= LENGTH) {
+                    return shortName.slice(0, LENGTH).toUpperCase();
+                }
+            }
+
+            // Second pass: insert additional letters from each word.
+            let addedLetters = 0;
+
+            for (let w = 0; w < splitName.length; w++) {
+                const word = splitName[w].replace(/^[_-]+/, "");
+
+                for (let i = 1; i < word.length; i++) {
+                    if ("_-".includes(word[i])) continue;
+
+                    const insertPos = Math.min(w + ++addedLetters, shortName.length);
+
+                    shortName =
+                        shortName.slice(0, insertPos) +
+                        word[i] +
+                        shortName.slice(insertPos);
+
+                    if (shortName.length === LENGTH) {
+                        return shortName.toUpperCase();
+                    }
+                }
+            }
+        }
+
+        return fullName.slice(0, LENGTH).toUpperCase();
     }
 }
 
