@@ -1,6 +1,7 @@
 import { PacketType, UserType } from "tsinsim";
 import { Packet } from "./Packet.js";
 import { Player, PlayerGetter } from "./Player.js";
+import { Event, EventType } from "./Event.js";
 
 type CallbackFn = (player: Player, ...args: any[]) => void;
 
@@ -16,9 +17,13 @@ export const Command = {
     },
 
     fire(name: string, player: Player, ...args: any[]) {
+        var fired = false;
         this.all.filter((command) => command.name === name).forEach((command) => {
             command.callback(player, ...args);
+            fired = true;
         });
+
+        return fired;
     }
 }
 
@@ -28,5 +33,8 @@ Packet.on(PacketType.ISP_MSO, (data, server) => {
     const Message = data.Text.slice(data.TextStart, data.Text.length);if(Message.length <= 1) return;
     
     const MessageChunks = Message.split(' ');
-    Command.fire(MessageChunks[0].slice(1, MessageChunks[0].length), player, ...MessageChunks.slice(1, MessageChunks.length));
+    const status = Command.fire(MessageChunks[0].slice(1, MessageChunks[0].length), player, ...MessageChunks.slice(1, MessageChunks.length));
+    if(!status) {
+        Event.fire(EventType.USED_UNKNOWN_COMMAND, player, MessageChunks[0].slice(1, MessageChunks[0].length))
+    }
 });

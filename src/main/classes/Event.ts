@@ -33,7 +33,9 @@ export enum EventType {
     BUTTON_GROUP_DELETE,
 
     PLAYER_LAYOUT_ADD,
-    PLAYER_LAYOUT_REMOVE
+    PLAYER_LAYOUT_REMOVE,
+
+    USED_UNKNOWN_COMMAND
 }
 
 type EventMap = {
@@ -67,6 +69,8 @@ type EventMap = {
 
     [EventType.PLAYER_LAYOUT_ADD]: [ player: Player, data: ObjectInfo[] ];
     [EventType.PLAYER_LAYOUT_REMOVE]: [ player: Player, data: ObjectInfo[] ];
+
+    [EventType.USED_UNKNOWN_COMMAND]: [ player: Player, command: string ];
 };
 
 
