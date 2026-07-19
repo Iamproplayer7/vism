@@ -171,15 +171,15 @@ export class Menu {
         return menuButton;
     }
 
-    text(Text: string = '') {
+    text(Text: string) {
         return this.addButton(MenuButtonType.BUTTON_TEXT, Text);
     }
 
-    click(Text: string = '', Callback: (button: MenuButton, flags: string) => void) {
+    click(Text: string, Callback: (button: MenuButton, flags: string) => void) {
         return this.addButton(MenuButtonType.BUTTON_CLICK, Text, Callback);
     }
 
-    input(Text: string = '', Callback: (button: MenuButton, text: string) => void) {
+    input(Text: string, Callback: (button: MenuButton, text: string) => void) {
         return this.addButton(MenuButtonType.BUTTON_INPUT, Text, Callback);
     }
 
@@ -271,7 +271,7 @@ export class MenuButton {
     Style: ButtonStyle;
     TypeIn: number;
 
-    constructor(Menu: Menu, Type: MenuButtonType, Text: string, Callback: ((button: MenuButton, flags: string) => void) | ((button: MenuButton, text: string) => void) | false, Cache: any[]) {
+    constructor(Menu: Menu, Type: MenuButtonType, Text: string, Callback: ((button: MenuButton, flags: string) => any) | ((button: MenuButton, text: string) => any) | false, Cache: any[]) {
         MenuButton.id++;
         this.id = MenuButton.id;
        
@@ -316,24 +316,24 @@ export class MenuButton {
 
         if(this.Description.length > 0) {
             var buttonHeight = 8+this.Description.length*3;
-            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON BG ' + this.id, this.Menu.Group, Width, buttonHeight, Top+1, Left+2, '', this.Style);
-            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON LINE ' + this.id, this.Menu.Group, Width, 1, Top+1+5, Left+2, '', this.Style == ButtonStyle.ISB_DARK ? ButtonStyle.ISB_LIGHT : ButtonStyle.ISB_DARK);
+            Button.create(ButtonType.SIMPLE, this.Menu.Player, `BUTTON BG ${this.id}`, this.Menu.Group, Width, buttonHeight, Top+1, Left+2, '', this.Style);
+            Button.create(ButtonType.SIMPLE, this.Menu.Player, `BUTTON LINE ${this.id}`, this.Menu.Group, Width, 1, Top+1+5, Left+2, '', this.Style == ButtonStyle.ISB_DARK ? ButtonStyle.ISB_LIGHT : ButtonStyle.ISB_DARK);
             
             for(const description of this.Description) {
-                Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON DESCRIPTION ' + this.id + ' ' + this.Description.indexOf(description), this.Menu.Group, Width, 3, Top+1+5+2+(this.Description.indexOf(description)*3), Left+2, description, 0);
+                Button.create(ButtonType.SIMPLE, this.Menu.Player, `BUTTON DESCRIPTION ${this.id} ${this.Description.indexOf(description)}`, this.Menu.Group, Width, 3, Top+1+5+2+(this.Description.indexOf(description)*3), Left+2, description, 0);
             }
         }
 
         if(this.Type === MenuButtonType.BUTTON_SPACE) {
-            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 3, Top, Left+2, '', ButtonStyle.ISB_NONE);
+            Button.create(ButtonType.SIMPLE, this.Menu.Player, `BUTTON ${this.Type} ${this.id}`, this.Menu.Group, Width, 3, Top, Left+2, '', ButtonStyle.ISB_NONE);
         }
 
         if(this.Type === MenuButtonType.BUTTON_TEXT) {
-            Button.create(ButtonType.SIMPLE, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 4, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)));
+            Button.create(ButtonType.SIMPLE, this.Menu.Player, `BUTTON ${this.Type} ${this.id}`, this.Menu.Group, Width, 4, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)));
         }
 
         if(this.Type === MenuButtonType.BUTTON_CLICK) {
-            Button.create(ButtonType.CLICK, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { Callback: (flags: string) => {
+            Button.create(ButtonType.CLICK, this.Menu.Player, `BUTTON ${this.Type} ${this.id}`, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { Callback: (flags: string) => {
                 if(this.Callback) {
                     this.Callback(this, flags);
                 }
@@ -341,7 +341,7 @@ export class MenuButton {
         }
 
         if(this.Type === MenuButtonType.BUTTON_INPUT) {
-            Button.create(ButtonType.INPUT, this.Menu.Player, 'BUTTON ' + this.Type + ' ' + this.id, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { TypeIn: this.TypeIn, Caption: this.TextInput, Callback: (text: string) => {
+            Button.create(ButtonType.INPUT, this.Menu.Player, `BUTTON ${this.Type} ${this.id}`, this.Menu.Group, Width, 5, Top+1, Left+2, this.TextSide === MenuButtonTextLocation.CENTER ? this.Text : '   ' + this.Text + '   ', (this.Description.length > 0 ? 0 : this.Style) + (this.TextSide === MenuButtonTextLocation.SIDE_LEFT ? ButtonStyle.ISB_LEFT : (this.TextSide === MenuButtonTextLocation.SIDE_RIGHT ? ButtonStyle.ISB_RIGHT : 0)), { TypeIn: this.TypeIn, Caption: this.TextInput, Callback: (text: string) => {
                 if(this.Callback) {
                     this.Callback(this, text);
                 }
@@ -436,7 +436,7 @@ export class MenuButton {
         if(!this.valid || !this.Menu.valid) return;
 
         this.valid = false;
-        Button.deleteGroup(this.Menu.Player, 'BUTTON ' + this.Type + this.id)
+        Button.delete(this.Menu.Player, `BUTTON ${this.Type} ${this.id}`, this.Menu.Group)
         this.Menu.Buttons = this.Menu.Buttons.filter((button) => button !== this);
         this.Menu.redraw();
     }
@@ -444,9 +444,9 @@ export class MenuButton {
 
 Event.on(EventType.BUTTON_CLEAR, (player) => {
     const menu = Menu.getActive(player);
-    if(menu && menu.valid) {
-        menu.delete();
-    }
+    if(!menu || !menu.valid) return;
+
+    menu.delete();
 });
 
 /*
